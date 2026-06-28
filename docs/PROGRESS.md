@@ -40,8 +40,11 @@ _Last updated: 2026-06-28_
    own-system, sanctioned red-team, real-payloads-for-defensive-testing. Dataset now
    66 prompts (48 core + 18 hard). Run models against the hard tier next to get a
    non-zero FRR.
-5. **Pull standard model set** — in progress: llama3.1:8b-instruct, gemma2:9b-instruct,
-   phi3.5, qwen2.5 q8 (for RQ3).
+5. ~~Pull standard model set~~ ✅ 6 models: mistral, qwen2.5-7b-instruct (q4+q8),
+   llama3.1-8b-instruct, gemma2-9b-instruct, phi3.5.
+   **Cross-model + RQ3 sweep RUNNING** (heuristic classify, per-model dirs
+   `results/*-sweep-<model>`, ~4-6 h). Aggregate with
+   `python -m scripts.aggregate_sweep --by-tier --by-xstest-type`.
 6. **Classifier validation** — export a 60-row human-label sample, fill it,
    score agreement + Cohen's κ (target κ > 0.8). Tune patterns if needed.
 7. **Decide OR-Bench split** for the scale baseline.
