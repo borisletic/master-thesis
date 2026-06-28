@@ -1,0 +1,20 @@
+# Default experiment configuration. Override per-run via CLI flags.
+
+run:
+  output_dir: results
+  # which datasets to evaluate over (keys map to src/orr/datasets/loaders.py)
+  datasets: [security_swe, xstest]
+  # cap prompts per dataset for quick smoke tests (null = all)
+  limit: null
+
+classification:
+  # "heuristic" -> rule-based only; "hybrid" -> heuristic + LLM judge on ambiguous
+  mode: hybrid
+  # confidence band within which the heuristic defers to the LLM judge
+  ambiguous_if_unmatched: true
+
+inference:
+  # request timeout per prompt, seconds
+  timeout: 180
+  # ollama server
+  host: http://localhost:11434

@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.Python
+
+# Results / generated artifacts
+results/
+!results/.gitkeep
+*.log
+
+# Downloaded third-party datasets (fetched via scripts/download_datasets.py)
+data/xstest/*.csv
+data/xstest/*.json
+data/or_bench/*.csv
+data/or_bench/*.parquet
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local secrets / overrides
+.env
+config/local.yaml

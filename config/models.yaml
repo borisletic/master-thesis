@@ -1,0 +1,84 @@
+# Model matrix for the over-refusal study.
+#
+# Two crossed dimensions:
+#   - alignment: aligned/instruct vs. base/uncensored (RQ2, "alignment tax")
+#   - quantization: FP16 -> INT8 (Q8) -> INT4 (Q4_K_M) (RQ3)
+#
+# `ollama_tag` is what `ollama pull` / the API expects. Tags marked `available: false`
+# are aspirational targets — flip to true once pulled. Some FP16 7-9B models do NOT
+# fit in 8 GB VRAM and will offload to CPU (slower but still runs); noted per-entry.
+
+defaults:
+  temperature: 0.0          # primary runs are greedy/deterministic
+  num_predict: 512          # max new tokens
+  seed: 42
+  # for the stochastic robustness runs (reported as mean ± std):
+  repeat_temperatures: [0.0, 0.7, 1.0]
+  repeats_per_temperature: 1
+
+models:
+  # ---------------- Qwen2.5 7B ----------------
+  - family: qwen2.5-7b
+    alignment: instruct
+    variants:
+      - quant: q4_K_M
+        ollama_tag: qwen2.5:7b-instruct-q4_K_M
+        approx_vram_gb: 5.0
+        available: false
+      - quant: q8_0
+        ollama_tag: qwen2.5:7b-instruct-q8_0
+        approx_vram_gb: 8.5      # borderline on 8GB; partial CPU offload
+        available: false
+      - quant: fp16
+        ollama_tag: qwen2.5:7b-instruct-fp16
+        approx_vram_gb: 15.0     # CPU offload on 8GB
+        available: false
+
+  # ---------------- Llama 3.1 8B ----------------
+  - family: llama3.1-8b
+    alignment: instruct
+    variants:
+      - quant: q4_K_M
+        ollama_tag: llama3.1:8b-instruct-q4_K_M
+        approx_vram_gb: 5.5
+        available: false
+      - quant: q8_0
+        ollama_tag: llama3.1:8b-instruct-q8_0
+        approx_vram_gb: 9.0
+        available: false
+
+  # ---------------- Gemma 2 9B ----------------
+  - family: gemma2-9b
+    alignment: instruct
+    variants:
+      - quant: q4_K_M
+        ollama_tag: gemma2:9b-instruct-q4_K_M
+        approx_vram_gb: 6.5
+        available: false
+
+  # ---------------- Phi (small) ----------------
+  - family: phi3.5
+    alignment: instruct
+    variants:
+      - quant: q4_K_M
+        ollama_tag: phi3.5:3.8b-mini-instruct-q4_K_M
+        approx_vram_gb: 2.5
+        available: false
+
+  # ---------------- Base / uncensored contrasts (RQ2) ----------------
+  # These approximate the "less-aligned" arm. Abliterated community models are
+  # used as a proxy for "alignment removed"; document provenance in the thesis.
+  - family: llama3.1-8b
+    alignment: uncensored
+    variants:
+      - quant: q4_K_M
+        ollama_tag: "huihui_ai/llama3.1-abliterated:8b-q4_K_M"
+        approx_vram_gb: 5.5
+        available: false
+
+# Optional cloud "ceiling" reference and tie-break judge (RQ comparison only).
+judge:
+  # Used by src/orr/classification/llm_classifier.py for ambiguous cases.
+  # local judge by default; set provider: anthropic/openai to use a cloud ceiling.
+  provider: local
+  local_model: qwen2.5:7b-instruct-q4_K_M
