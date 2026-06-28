@@ -30,6 +30,7 @@ class Prompt:
     trigger_words: list[str] = field(default_factory=list)
     pair_id: str | None = None      # links a benign prompt to its harmful contrast
     source: str = ""
+    tier: str = "core"              # "core" (paired) | "hard" (unpaired stress test)
     meta: dict = field(default_factory=dict)
 
 
@@ -50,7 +51,14 @@ def _read_jsonl(path: Path) -> list[dict]:
 def load_security_swe(data_dir: Path | None = None) -> list[Prompt]:
     base = (data_dir or _DATA_DIR) / "security_swe"
     prompts: list[Prompt] = []
-    for fname, gold in (("benign.jsonl", GOLD_COMPLY), ("harmful.jsonl", GOLD_REFUSE)):
+    files = (
+        ("benign.jsonl", GOLD_COMPLY),
+        ("harmful.jsonl", GOLD_REFUSE),
+        ("benign_hard.jsonl", GOLD_COMPLY),   # unpaired over-refusal stress tests
+    )
+    _known = {"id", "prompt", "label", "category", "trigger_words",
+              "pair_id", "source", "tier"}
+    for fname, gold in files:
         path = base / fname
         if not path.exists():
             continue
@@ -65,9 +73,8 @@ def load_security_swe(data_dir: Path | None = None) -> list[Prompt]:
                     trigger_words=row.get("trigger_words", []),
                     pair_id=row.get("pair_id"),
                     source=row.get("source", ""),
-                    meta={k: v for k, v in row.items()
-                          if k not in {"id", "prompt", "label", "category",
-                                       "trigger_words", "pair_id", "source"}},
+                    tier=row.get("tier", "core"),
+                    meta={k: v for k, v in row.items() if k not in _known},
                 )
             )
     return prompts
@@ -88,11 +95,14 @@ def load_xstest(data_dir: Path | None = None) -> list[Prompt]:
     with csv_path.open(encoding="utf-8", newline="") as f:
         for i, row in enumerate(csv.DictReader(f)):
             label_raw = (row.get("label") or row.get("type_label") or "").strip().lower()
-            is_safe = "safe" in label_raw or label_raw == "safe"
-            # XSTest "type" values for unsafe prompts start with "contrast_"
             type_v = (row.get("type") or "").strip()
-            if not label_raw:
+            # XSTest label is exactly "safe" / "unsafe"; fall back to the "type"
+            # column (unsafe prompt types are prefixed "contrast_") if absent.
+            if label_raw in {"safe", "unsafe"}:
+                is_safe = label_raw == "safe"
+            else:
                 is_safe = not type_v.startswith("contrast")
+            focus = (row.get("focus") or "").strip()
             prompts.append(
                 Prompt(
                     id=row.get("id_v2") or row.get("id") or f"xstest-{i}",
@@ -100,6 +110,7 @@ def load_xstest(data_dir: Path | None = None) -> list[Prompt]:
                     gold=GOLD_COMPLY if is_safe else GOLD_REFUSE,
                     dataset="xstest",
                     category=type_v or "unknown",
+                    trigger_words=[focus] if focus else [],
                     source="XSTest (Röttger et al. 2024)",
                 )
             )
