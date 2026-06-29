@@ -42,9 +42,19 @@ _Last updated: 2026-06-28_
    non-zero FRR.
 5. ~~Pull standard model set~~ ✅ 6 models: mistral, qwen2.5-7b-instruct (q4+q8),
    llama3.1-8b-instruct, gemma2-9b-instruct, phi3.5.
-   **Cross-model + RQ3 sweep RUNNING** (heuristic classify, per-model dirs
-   `results/*-sweep-<model>`, ~4-6 h). Aggregate with
-   `python -m scripts.aggregate_sweep --by-tier --by-xstest-type`.
+   **Cross-model + RQ3 sweep RUNNING** via `scripts/run_sweep.sh` (resumable,
+   heuristic classify, per-model dirs `results/*-sweep-<model>`, ~4-6 h).
+   Aggregate with `python -m scripts.aggregate_sweep --by-tier --by-xstest-type`.
+
+   ### Sweep ops protocol (the run gets killed at session boundaries — resume safely)
+   `scripts/run_sweep.sh` is **idempotent**: it SKIPS any model whose dir already
+   has 516 rows and re-runs partials. To resume after an interruption:
+   1. **FIRST check for live workers** (a "stopped" notification can be a FALSE
+      alarm — the process may still be running):
+      `powershell "Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | ? { $_.CommandLine -like '*run_experiment*' }"`
+   2. If a worker is alive → do NOT relaunch (would duplicate + thrash the GPU); wait.
+   3. If none alive and not all 6 dirs are complete → `bash scripts/run_sweep.sh` again.
+   4. Completed so far: mistral ✅. (Update as models finish.)
 6. **Classifier validation** — export a 60-row human-label sample, fill it,
    score agreement + Cohen's κ (target κ > 0.8). Tune patterns if needed.
 7. **Decide OR-Bench split** for the scale baseline.
