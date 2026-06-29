@@ -67,5 +67,7 @@ adjudicated and the rule refined. See `scripts/validate_classifier.py` and
 ## Ethics
 
 Harmful prompts exist only as negative labels to confirm models retain safety.
-They are deliberately under-specified (no real targets, no working payloads) and
-no harmful model *output* is committed to the repo. See `docs/ETHICS.md`.
+They are deliberately under-specified (no real targets, no working payloads). For
+reproducibility, full model outputs (including responses to these prompts) are
+retained in `results/`; see `docs/ETHICS.md` for the rationale and the caveat that
+those files contain unfiltered, harmful-by-construction outputs.

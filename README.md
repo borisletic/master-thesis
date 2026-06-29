@@ -36,8 +36,8 @@ master-thesis/
 │   ├── classification/     # refusal detection (heuristics + LLM judge)
 │   └── evaluation/         # metrics (FRR, compliance, alignment tax)
 ├── scripts/                # CLI entry points (download, run, analyze)
-├── results/                # generated outputs (git-ignored)
-├── docs/                   # thesis text, methodology notes
+├── results/                # committed run outputs (manifests, responses, metrics)
+├── docs/                   # thesis text (docs/thesis/), methodology, findings
 └── tests/
 ```
 
@@ -55,9 +55,22 @@ ollama pull qwen2.5:7b-instruct-q4_K_M
 python -m scripts.run_experiment --models qwen2.5:7b-instruct-q4_K_M \
     --datasets security_swe --limit 5
 
-# 4. analyze
+# 4. analyze a single run
 python -m scripts.analyze_results results/latest
+
+# --- reproduce / inspect the full study ---
+# re-run the 6-model sweep (resumable, ~hours on an 8GB GPU)
+bash scripts/run_sweep.sh
+# re-score saved responses with the validated hybrid classifier
+python -m scripts.reclassify --glob '*sweep*'
+# the validated cross-model tables (RQ1/RQ2/RQ4)
+python -m scripts.aggregate_sweep --glob '2026*sweep*' \
+    --responses-name responses_hybrid.jsonl --by-tier --by-xstest-type
 ```
+
+The committed [`results/`](results/) already contain every run's outputs and
+`sweep_hybrid_metrics.json`, so the tables can be regenerated without re-running
+inference.
 
 ## Hardware target
 
@@ -67,12 +80,34 @@ data privacy (GDPR/DSGVO): business-sensitive code must not leave the premises.
 
 ## Status
 
-See [docs/PROGRESS.md](docs/PROGRESS.md) for the current build status and next steps.
+**Experiments complete.** Six models evaluated on XSTest + the Security-SWE set,
+with a human-validated refusal classifier (Cohen's κ = 0.72); RQ1–RQ4 answered.
+Results live in [`results/`](results/) (per-run `responses*.jsonl` + `metrics.json`,
+plus `sweep_hybrid_metrics.json`); the thesis draft is in
+[`docs/thesis/`](docs/thesis/README.md). Findings log: [docs/FINDINGS.md](docs/FINDINGS.md);
+build history: [docs/PROGRESS.md](docs/PROGRESS.md).
+
+### Headline result (security-SWE, validated)
+
+| Model | over-refusal (FRR hard) | safety (TRR) | effective utility |
+|---|---:|---:|---:|
+| mistral-7B | 0.0% | 41.7% | 0.94 |
+| phi-3.5-mini | 11.1% | 20.8% | 0.71 |
+| qwen2.5-7B Q4 | 5.6% | 79.2% | 0.90 |
+| qwen2.5-7B Q8 | 5.6% | 91.7% | 0.93 |
+| gemma2-9B | 55.6% | 100% | 0.71 |
+| llama3.1-8B | 72.2% | 100% | 0.63 |
+
+**Recommendation:** qwen2.5-7B-Instruct (4-bit) — best joint over-refusal / safety /
+utility on 8 GB on-premise hardware.
 
 ## License & ethics
 
 The own dataset is built from public sources (CWE/CVE descriptions, defensive/CTF
 write-ups, StackOverflow-style dev questions, log snippets). Harmful "control"
-prompts are included **only** as negative labels to verify that models retain
-safety; no functional harmful artifacts are produced or stored. See
-[docs/ETHICS.md](docs/ETHICS.md).
+prompts are included **only** as negative labels to verify that models retain safety.
+For reproducibility this public repo **retains full model outputs** in `results/`,
+including responses to harmful-control prompts (produced by small local models from
+deliberately under-specified prompts). Anyone reusing the data should read
+[docs/ETHICS.md](docs/ETHICS.md) — `results/*/responses*.jsonl` contain unfiltered,
+harmful-by-construction outputs.

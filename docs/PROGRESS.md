@@ -28,7 +28,10 @@ _Last updated: 2026-06-28_
 - **Thesis draft written**: English Markdown, 8 chapters + refs (~6k words) in
   `docs/thesis/` — see [thesis/README.md](thesis/README.md).
 - Remaining: thesis revision/polish; optional (2nd grader, OR-Bench at scale,
-  inter-annotator κ); convert to .docx when content settled. **Not yet committed.**
+  inter-annotator κ); convert to .docx when content settled.
+- Code + dataset + results + thesis draft are committed and pushed to the public
+  GitHub remote (`results/` is no longer git-ignored — full outputs retained; see
+  docs/ETHICS.md for the rationale/caveat).
 
 ## First result (see docs/FINDINGS.md)
 

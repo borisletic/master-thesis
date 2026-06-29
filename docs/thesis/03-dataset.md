@@ -87,7 +87,10 @@ general-domain baseline.
 
 The dataset measures safety behavior; it does not build attack tooling. Harmful
 prompts are negative labels only, under-specified (no working payloads, no real
-targets — RFC-5737/RFC-2606 reserved addresses), and **no harmful model output is
-retained** in published artifacts (only the refusal/comply label). Benign content is
-drawn from openly-licensed public sources with provenance recorded. The full
-statement is in the repository's `docs/ETHICS.md`.
+targets — RFC-5737/RFC-2606 reserved addresses). For reproducibility and
+auditability of the safety results, complete model outputs — including responses to
+harmful-control prompts — are **retained** in the project's `results/`; since the
+prompts are under-specified and the models are small open releases, these outputs
+carry no operational capability beyond what those public models already produce.
+Benign content is drawn from openly-licensed public sources with provenance recorded.
+The full statement is in the repository's `docs/ETHICS.md`.
