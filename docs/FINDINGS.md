@@ -311,5 +311,29 @@ their `expected_help` anchors, 0-2 normalized to 0-1 (`scripts/score_utility.py`
   validated refusal counts, not grades. Coarse 0/1/2 scale. A second grader (or human
   spot-check) would harden absolute quality values.
 
-## STATUS: all 4 RQs complete, RQ2 now two-dimensional (refusal + utility)
-Remaining: thesis write-up; optional breadth (RQ3 2nd family; second grader).
+## 2026-06-29 — RQ3 second family (llama Q4 vs Q8): generalizes
+
+Same design on llama3.1 Q4 vs Q8 (hybrid labels):
+
+| temp | Q4 FRR | Q8 FRR | Q4 TRR | Q8 TRR |
+|------|-------:|-------:|-------:|-------:|
+| 0.0  | 35.7%  | 33.3%  | 100%   | 100%   |
+| 0.7  | 34.1 ±3.0% | 33.3 ±3.4% | 100% | 98.6 ±2.0% |
+| 1.0  | 31.7 ±3.0% | 24.6 ±4.9% | 100% | 100%   |
+
+- **TRR (safety): zero quant effect** — both quants pinned at ~100% (llama is
+  maximally safe on this set regardless of precision).
+- **FRR (over-refusal):** Q8 slightly lower than Q4 (ΔFRR −2.4 to −7.1pp), but the
+  ±3–5pp std bands mostly cover it; the −7.1pp at temp 1.0 is ~1.5σ — a weak hint,
+  not robust.
+- Secondary effect: llama's over-refusal **drops with temperature** (Q4 35.7→31.7%,
+  Q8 33.3→24.6%) — sampling occasionally yields a non-refusal.
+
+**RQ3 conclusion (both families):** quantization Q4↔Q8 has **no robust effect on
+safety** and **at most a weak, noise-adjacent effect on over-refusal**, in the
+*benign* direction. The qwen finding generalizes to llama. Single-greedy-run quant
+comparisons remain unreliable. Hardware note: llama-8B-Q8 runs with CPU offload on
+the 8 GB card (~3× slower than Q4) — a real deployment cost for marginal/no benefit.
+
+## STATUS: ALL experiments done — RQ1–RQ4 answered, RQ2 two-dimensional, RQ3 ×2 families
+Next: thesis write-up. (Further-optional: second utility grader to de-bias quality.)

@@ -6,12 +6,14 @@
 # hybrid re-score afterward with scripts/reclassify.py (same as the main sweep).
 # Idempotent: a (model,temp,rep) dir with 66 rows is skipped.
 #
-#   bash scripts/run_rq3.sh
+# Models default to the qwen Q4/Q8 pair; override by passing model tags as args:
+#   bash scripts/run_rq3.sh                                   # qwen pair (default)
+#   bash scripts/run_rq3.sh llama3.1:8b-instruct-q4_K_M llama3.1:8b-instruct-q8_0
 set -u
 cd "$(dirname "$0")/.."
 
 EXPECTED=66
-MODELS=(qwen2.5:7b-instruct-q4_K_M qwen2.5:7b-instruct-q8_0)
+if [ "$#" -gt 0 ]; then MODELS=("$@"); else MODELS=(qwen2.5:7b-instruct-q4_K_M qwen2.5:7b-instruct-q8_0); fi
 # "temperature reps"
 CONFIGS=("0.0 1" "0.7 3" "1.0 3")
 

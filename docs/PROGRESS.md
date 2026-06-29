@@ -18,14 +18,17 @@ _Last updated: 2026-06-28_
       `download_datasets`, `validate_classifier`.
 - [x] **Tests** — 13 passing (heuristics, metrics, dataset integrity); no GPU needed.
 
-## Milestone (2026-06-29): all 4 RQs answered with validated labels
+## Milestone (2026-06-29): all 4 RQs answered + thesis draft written
 
 - 6-model sweep (XSTest + security-SWE) complete; **hybrid classifier human-validated
   (κ=0.716, 86.7% acc)** → all numbers use hybrid (`responses_hybrid.jsonl`).
-- **RQ1** domain vs general; **RQ2** alignment–utility trade-off (sharp on hard tier);
-  **RQ3** quantization effect within sampling noise (qwen Q4≈Q8 over repeats);
-  **RQ4** over-refusal is contextual, not lexical. See docs/FINDINGS.md.
-- Remaining: thesis write-up; optional breadth (RQ3 2nd family, RQ2 utility scoring).
+- **RQ1** domain vs general; **RQ2** alignment–utility trade-off + utility scoring
+  (tax paid via refusal not quality); **RQ3** quantization within sampling noise,
+  replicated on qwen AND llama; **RQ4** over-refusal contextual not lexical.
+- **Thesis draft written**: English Markdown, 8 chapters + refs (~6k words) in
+  `docs/thesis/` — see [thesis/README.md](thesis/README.md).
+- Remaining: thesis revision/polish; optional (2nd grader, OR-Bench at scale,
+  inter-annotator κ); convert to .docx when content settled. **Not yet committed.**
 
 ## First result (see docs/FINDINGS.md)
 
