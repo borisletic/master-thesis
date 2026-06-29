@@ -17,7 +17,7 @@ models × alignment-variants × quantization-levels:
 - **RQ3** — Does quantization (FP16 → INT8 → INT4) shift over-refusal of benign
   tasks, and in which direction? (Prior work studies quantization × *harmful
   compliance*; the benign-refusal direction is unexplored.)
-- **RQ4** (optional) — Which trigger words/topics drive lexical over-refusal — is
+- **RQ4** — Which trigger words/topics drive lexical over-refusal — is
   the failure lexical or contextual?
 
 ## Repository layout
