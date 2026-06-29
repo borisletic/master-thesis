@@ -1,0 +1,17 @@
+{
+  "created": "2026-06-29T22:21:17.809413",
+  "models": [
+    "llama3.1:8b-instruct-q8_0"
+  ],
+  "datasets": [
+    "security_swe"
+  ],
+  "limit": null,
+  "temperature": 1.0,
+  "seed": 42,
+  "num_predict": 512,
+  "classify": "heuristic",
+  "system_prompt": null,
+  "n_prompts_per_model": 66,
+  "total_generations": 66
+}

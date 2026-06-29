@@ -10,8 +10,7 @@ venv/
 env/
 .Python
 
-# Results / generated artifacts
-results/
+# generated artifacts
 !results/.gitkeep
 *.log
 

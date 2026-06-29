@@ -1,0 +1,17 @@
+{
+  "created": "2026-06-28T21:25:18.420227",
+  "models": [
+    "qwen2.5:7b-instruct-q4_K_M"
+  ],
+  "datasets": [
+    "security_swe"
+  ],
+  "limit": null,
+  "temperature": 0.0,
+  "seed": 42,
+  "num_predict": 512,
+  "classify": "hybrid",
+  "system_prompt": null,
+  "n_prompts_per_model": 48,
+  "total_generations": 48
+}

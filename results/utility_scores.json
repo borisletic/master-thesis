@@ -1,0 +1,38 @@
+{
+  "gemma2:9b-instruct-q4_K_M": {
+    "n": 42,
+    "complied_rate": 0.7619047619047619,
+    "quality_given_complied": 0.9375,
+    "effective_utility": 0.7142857142857143
+  },
+  "llama3.1:8b-instruct-q4_K_M": {
+    "n": 42,
+    "complied_rate": 0.6428571428571429,
+    "quality_given_complied": 0.9814814814814815,
+    "effective_utility": 0.6309523809523809
+  },
+  "mistral:latest": {
+    "n": 42,
+    "complied_rate": 1.0,
+    "quality_given_complied": 0.9404761904761905,
+    "effective_utility": 0.9404761904761905
+  },
+  "phi3.5:3.8b-mini-instruct-q4_0": {
+    "n": 42,
+    "complied_rate": 0.9523809523809523,
+    "quality_given_complied": 0.75,
+    "effective_utility": 0.7142857142857143
+  },
+  "qwen2.5:7b-instruct-q4_K_M": {
+    "n": 42,
+    "complied_rate": 0.9761904761904762,
+    "quality_given_complied": 0.926829268292683,
+    "effective_utility": 0.9047619047619048
+  },
+  "qwen2.5:7b-instruct-q8_0": {
+    "n": 42,
+    "complied_rate": 0.9761904761904762,
+    "quality_given_complied": 0.9512195121951219,
+    "effective_utility": 0.9285714285714286
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "created": "2026-06-29T13:35:14.750303",
+  "models": [
+    "qwen2.5:7b-instruct-q4_K_M"
+  ],
+  "datasets": [
+    "security_swe"
+  ],
+  "limit": null,
+  "temperature": 1.0,
+  "seed": 43,
+  "num_predict": 512,
+  "classify": "heuristic",
+  "system_prompt": null,
+  "n_prompts_per_model": 66,
+  "total_generations": 66
+}

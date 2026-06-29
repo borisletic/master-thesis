@@ -1,0 +1,237 @@
+{
+  "models": [
+    {
+      "model": "gemma2:9b-instruct-q4_K_M",
+      "dataset": "security_swe",
+      "n_benign": 42,
+      "n_harmful": 24,
+      "false_refusal_rate": 0.23809523809523808,
+      "safe_compliance_rate": 0.7619047619047619,
+      "true_refusal_rate": 1.0,
+      "harmful_compliance_rate": 0.0,
+      "benign_counts": {
+        "compliance": 29,
+        "partial": 3,
+        "refusal": 10
+      },
+      "harmful_counts": {
+        "refusal": 24
+      }
+    },
+    {
+      "model": "gemma2:9b-instruct-q4_K_M",
+      "dataset": "xstest",
+      "n_benign": 250,
+      "n_harmful": 200,
+      "false_refusal_rate": 0.224,
+      "safe_compliance_rate": 0.776,
+      "true_refusal_rate": 0.86,
+      "harmful_compliance_rate": 0.14,
+      "benign_counts": {
+        "compliance": 168,
+        "partial": 26,
+        "refusal": 56
+      },
+      "harmful_counts": {
+        "refusal": 172,
+        "compliance": 27,
+        "partial": 1
+      }
+    },
+    {
+      "model": "llama3.1:8b-instruct-q4_K_M",
+      "dataset": "security_swe",
+      "n_benign": 42,
+      "n_harmful": 24,
+      "false_refusal_rate": 0.35714285714285715,
+      "safe_compliance_rate": 0.6428571428571428,
+      "true_refusal_rate": 1.0,
+      "harmful_compliance_rate": 0.0,
+      "benign_counts": {
+        "compliance": 27,
+        "refusal": 15
+      },
+      "harmful_counts": {
+        "refusal": 24
+      }
+    },
+    {
+      "model": "llama3.1:8b-instruct-q4_K_M",
+      "dataset": "xstest",
+      "n_benign": 250,
+      "n_harmful": 200,
+      "false_refusal_rate": 0.108,
+      "safe_compliance_rate": 0.892,
+      "true_refusal_rate": 0.845,
+      "harmful_compliance_rate": 0.15500000000000003,
+      "benign_counts": {
+        "compliance": 216,
+        "refusal": 27,
+        "partial": 7
+      },
+      "harmful_counts": {
+        "refusal": 169,
+        "compliance": 30,
+        "partial": 1
+      }
+    },
+    {
+      "model": "mistral:latest",
+      "dataset": "security_swe",
+      "n_benign": 42,
+      "n_harmful": 24,
+      "false_refusal_rate": 0.0,
+      "safe_compliance_rate": 1.0,
+      "true_refusal_rate": 0.4166666666666667,
+      "harmful_compliance_rate": 0.5833333333333333,
+      "benign_counts": {
+        "compliance": 41,
+        "partial": 1
+      },
+      "harmful_counts": {
+        "refusal": 10,
+        "partial": 6,
+        "compliance": 8
+      }
+    },
+    {
+      "model": "mistral:latest",
+      "dataset": "xstest",
+      "n_benign": 250,
+      "n_harmful": 200,
+      "false_refusal_rate": 0.108,
+      "safe_compliance_rate": 0.892,
+      "true_refusal_rate": 0.57,
+      "harmful_compliance_rate": 0.43000000000000005,
+      "benign_counts": {
+        "compliance": 207,
+        "refusal": 27,
+        "partial": 16
+      },
+      "harmful_counts": {
+        "refusal": 114,
+        "compliance": 70,
+        "partial": 16
+      }
+    },
+    {
+      "model": "phi3.5:3.8b-mini-instruct-q4_0",
+      "dataset": "security_swe",
+      "n_benign": 42,
+      "n_harmful": 24,
+      "false_refusal_rate": 0.047619047619047616,
+      "safe_compliance_rate": 0.9523809523809523,
+      "true_refusal_rate": 0.20833333333333334,
+      "harmful_compliance_rate": 0.7916666666666666,
+      "benign_counts": {
+        "compliance": 38,
+        "partial": 2,
+        "refusal": 2
+      },
+      "harmful_counts": {
+        "refusal": 5,
+        "compliance": 15,
+        "partial": 4
+      }
+    },
+    {
+      "model": "phi3.5:3.8b-mini-instruct-q4_0",
+      "dataset": "xstest",
+      "n_benign": 250,
+      "n_harmful": 200,
+      "false_refusal_rate": 0.084,
+      "safe_compliance_rate": 0.916,
+      "true_refusal_rate": 0.31,
+      "harmful_compliance_rate": 0.69,
+      "benign_counts": {
+        "compliance": 215,
+        "partial": 14,
+        "refusal": 21
+      },
+      "harmful_counts": {
+        "compliance": 132,
+        "refusal": 62,
+        "partial": 6
+      }
+    },
+    {
+      "model": "qwen2.5:7b-instruct-q4_K_M",
+      "dataset": "security_swe",
+      "n_benign": 42,
+      "n_harmful": 24,
+      "false_refusal_rate": 0.023809523809523808,
+      "safe_compliance_rate": 0.9761904761904762,
+      "true_refusal_rate": 0.7916666666666666,
+      "harmful_compliance_rate": 0.20833333333333337,
+      "benign_counts": {
+        "compliance": 40,
+        "refusal": 1,
+        "partial": 1
+      },
+      "harmful_counts": {
+        "refusal": 19,
+        "partial": 4,
+        "compliance": 1
+      }
+    },
+    {
+      "model": "qwen2.5:7b-instruct-q4_K_M",
+      "dataset": "xstest",
+      "n_benign": 250,
+      "n_harmful": 200,
+      "false_refusal_rate": 0.128,
+      "safe_compliance_rate": 0.872,
+      "true_refusal_rate": 0.82,
+      "harmful_compliance_rate": 0.18000000000000005,
+      "benign_counts": {
+        "compliance": 205,
+        "refusal": 32,
+        "partial": 13
+      },
+      "harmful_counts": {
+        "refusal": 164,
+        "compliance": 32,
+        "partial": 4
+      }
+    },
+    {
+      "model": "qwen2.5:7b-instruct-q8_0",
+      "dataset": "security_swe",
+      "n_benign": 42,
+      "n_harmful": 24,
+      "false_refusal_rate": 0.023809523809523808,
+      "safe_compliance_rate": 0.9761904761904762,
+      "true_refusal_rate": 0.9166666666666666,
+      "harmful_compliance_rate": 0.08333333333333337,
+      "benign_counts": {
+        "compliance": 40,
+        "refusal": 1,
+        "partial": 1
+      },
+      "harmful_counts": {
+        "refusal": 22,
+        "partial": 2
+      }
+    },
+    {
+      "model": "qwen2.5:7b-instruct-q8_0",
+      "dataset": "xstest",
+      "n_benign": 250,
+      "n_harmful": 200,
+      "false_refusal_rate": 0.104,
+      "safe_compliance_rate": 0.896,
+      "true_refusal_rate": 0.825,
+      "harmful_compliance_rate": 0.17500000000000004,
+      "benign_counts": {
+        "compliance": 213,
+        "refusal": 26,
+        "partial": 11
+      },
+      "harmful_counts": {
+        "refusal": 165,
+        "partial": 3,
+        "compliance": 32
+      }
+    }
+  ]
+}

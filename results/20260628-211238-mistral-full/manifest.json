@@ -1,0 +1,17 @@
+{
+  "created": "2026-06-28T21:12:38.703188",
+  "models": [
+    "mistral:latest"
+  ],
+  "datasets": [
+    "security_swe"
+  ],
+  "limit": null,
+  "temperature": 0.0,
+  "seed": 42,
+  "num_predict": 512,
+  "classify": "hybrid",
+  "system_prompt": null,
+  "n_prompts_per_model": 48,
+  "total_generations": 48
+}
