@@ -275,4 +275,41 @@ write-up + optional breadth (more models for RQ3, utility scoring for RQ2's tax)
 - phi3.5 hybrid sec TRR 20.8% — genuinely over-compliant small model (note in thesis).
 - RQ3 currently qwen-only; extending to a second family (e.g. llama Q4/Q8) would test
   generality of the "no robust quant effect" claim.
-- RQ2 utility/tax: refusal-rate done; per-response utility scoring still pending.
+
+## 2026-06-29 — RQ2 utility/tax: the tax is paid in REFUSAL, not quality
+
+LLM-graded (qwen Q4 grader) helpfulness of complied benign security_swe answers vs
+their `expected_help` anchors, 0-2 normalized to 0-1 (`scripts/score_utility.py`,
+`results/utility_scores.json`). Full RQ2 picture (hybrid labels):
+
+| Model            | FRR hard | quality\|complied | effective utility | sec TRR |
+|------------------|---------:|------------------:|------------------:|--------:|
+| mistral-7b       |    0.0%  |       0.94        |     **0.94**      |  41.7%  |
+| phi3.5           |   11.1%  |       0.75        |       0.71        |  20.8%  |
+| qwen2.5-7b Q4    |    5.6%  |       0.93        |       0.90        |  79.2%  |
+| qwen2.5-7b Q8    |    5.6%  |       0.95        |     **0.93**      |  91.7%  |
+| gemma2-9b        |   55.6%  |       0.94        |       0.71        | 100.0%  |
+| llama3.1-8b      |   72.2%  |     **0.98**      |     **0.63**      | 100.0%  |
+
+- **quality | complied** is high and similar (~0.93-0.98) for everything except the
+  small phi3.5 (0.75). So alignment does **not** degrade answer *quality*.
+- **effective utility** (refusals = 0) tells the real tax story: **llama3.1 has the
+  BEST answer quality (0.98) but the WORST effective utility (0.63)** — because it
+  refuses 36% of benign tasks. The over-refusal, not bad answers, destroys delivered
+  helpfulness.
+- **The alignment tax is paid almost entirely through refusal, not quality.** A model
+  that over-refuses is unhelpful even though its (rare) answers are excellent.
+
+### Best-balanced model (all dimensions)
+**qwen2.5-7b-instruct Q8**: effective utility 0.93, safety (TRR) 91.7%, hard-FRR 5.6%
+— high help delivered, strong safety, little over-refusal. gemma/llama trade utility
+(0.63-0.71) for max safety (100%); mistral trades safety (41.7%) for utility (0.94).
+
+### Caveats
+- Grader is qwen Q4 grading all models incl. itself → possible mild self-preference;
+  the headline (quality flat, tax via refusal) is robust since it's driven by
+  validated refusal counts, not grades. Coarse 0/1/2 scale. A second grader (or human
+  spot-check) would harden absolute quality values.
+
+## STATUS: all 4 RQs complete, RQ2 now two-dimensional (refusal + utility)
+Remaining: thesis write-up; optional breadth (RQ3 2nd family; second grader).
