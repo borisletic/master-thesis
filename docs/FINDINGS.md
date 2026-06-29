@@ -103,7 +103,176 @@ Single model, single greedy run. Classifier not yet human-validated. mistral and
 other 4 models not yet run on XSTest. `contested` hard prompts (e.g. sec-bh-002) are
 exactly where "is this over-refusal?" is genuinely arguable — flag for annotation.
 
-### Next checks
-- Run mistral + llama3.1 + gemma2 + phi3.5 on XSTest + security_swe (cross-model RQ1/RQ4).
-- RQ3 quantization sweep: qwen Q4 vs Q8 (both pulled) on the same sets.
-- Human-label a sample; adjudicate `partial` redirects + `contested` hards; report κ.
+## 2026-06-29 — Full 6-model sweep (RQ1/RQ2/RQ3/RQ4)
+
+6 models × {XSTest 450, security_swe 66} = 3096 generations, temperature 0,
+**heuristic** classifier (consistent across models → rankings comparable; see the
+classifier caveat below). Run dirs: `results/*-sweep-*`. Combined metrics:
+`results/sweep_combined_metrics.json`.
+
+### Headline table — security-SWE
+
+| Model                    | FRR core | **FRR hard** | sec TRR | XSTest FRR |
+|--------------------------|---------:|-------------:|--------:|-----------:|
+| phi3.5-3.8b-instruct     |     0.0% |     0.0%     |   0.0%  |    1.6%    |
+| mistral-7b               |     0.0% |     0.0%     |  25.0%  |    1.6%    |
+| qwen2.5-7b-instruct Q4   |     0.0% |     5.6%     |  37.5%  |    2.8%    |
+| qwen2.5-7b-instruct Q8   |     0.0% |     0.0%     |  50.0%  |    3.2%    |
+| gemma2-9b-instruct       |     0.0% |    27.8%     |  70.8%  |    3.6%    |
+| llama3.1-8b-instruct     |     8.3% |    61.1%     |  79.2%  |    3.2%    |
+
+### RQ2 — the alignment-utility trade-off (the central result)
+Over-refusal (hard-tier FRR) and safety (security TRR) **move together** across
+models — a monotonic trade-off:
+- Never-over-refuse models (phi3.5, mistral) are **unsafe** (TRR 0%, 25%).
+- Strong-safety models (llama 79%, gemma 71%) **over-refuse** the hard benign
+  security tier (61%, 28%).
+- qwen sits in the sweet spot (low FRR, mid TRR).
+
+→ The "alignment tax" is **real and visible** in this domain, but only on the
+**hard tier** (high-pressure / own-system / roleplay-for-defense). On the core
+tier every model is ~0% except llama (8.3%). Without the hard tier the trade-off
+would be invisible — validating the dataset-hardening step.
+
+### RQ1 — domain vs general
+For the over-refusing models, security-SWE FRR (llama 31%, gemma 12%) **exceeds**
+general XSTest FRR (~3%). So security framing elicits *more* over-refusal than
+general prompts — **for those models**. Not universal: qwen/mistral/phi are flat.
+
+### RQ3 — quantization (qwen Q4 vs Q8) [novel direction]
+| metric (qwen)        | Q4    | Q8    |
+|----------------------|-------|-------|
+| security FRR (hard)  | 5.6%  | 0.0%  |
+| security TRR         | 37.5% | 50.0% |
+| XSTest FRR           | 2.8%  | 3.2%  |
+| XSTest TRR           | 57.5% | 63.5% |
+
+Direction: the more-aggressively-quantized **Q4 over-refuses slightly MORE and is
+slightly LESS safe** than Q8. Effect is **small** (a few prompts on security; ~12
+on XSTest TRR) and from a **single greedy run** — suggestive, not significant.
+Needs temperature repeats (mean±std) before any claim. But it is a measurable
+shift in the *benign-over-refusal* direction, which prior work (harmful-compliance
+only) does not cover.
+
+### RQ4 — lexical vs contextual (robust across classifiers)
+XSTest refusals concentrate in **contextual/topical** types (privacy_fictional,
+safe_contexts, safe_targets) for every model; the **lexical** types — homonyms
+("kill a process"), figurative_language, definitions — are 0–4% everywhere.
+→ Over-refusal is **contextual, not lexical**. Holds under both the heuristic
+(this run) and the earlier hybrid run. The security hard-tier refusals are likewise
+contextual (intent/pressure framing), not keyword-driven.
+
+### ⚠ Classifier-sensitivity caveat (important for the write-up)
+Absolute FRR for **contextual** categories is **highly classifier-dependent**.
+qwen XSTest privacy_fictional FRR was **72%** under the hybrid LLM-judge but **12%**
+under the heuristic; overall qwen XSTest FRR 11.6% (hybrid) vs 2.8% (heuristic).
+The heuristic under-counts soft/redirect refusals the LLM-judge catches. Therefore:
+- **Cross-model rankings** (same heuristic for all) are valid.
+- **Absolute FRR**, esp. contextual categories, must be reported with the validated
+  classifier. → Human-validation + hybrid re-score is now the top priority before
+  any number is final.
+- The clear hard-tier security refusals (llama 61%, gemma 28%) are explicit
+  "I can't assist" refusals → heuristic-robust, but confirm in validation.
+
+## 2026-06-29 — Hybrid re-score + classifier-disagreement finding
+
+Re-scored all 6 sweep dirs with the hybrid LLM-judge (qwen Q4 judge) on the saved
+responses (`scripts/reclassify.py` → `responses_hybrid.jsonl`; 1290 judge calls).
+
+### ⚠⚠ Headline methodological finding: classifiers disagree massively
+The heuristic and hybrid relabel **30–44% of responses** (mistral 158, llama 188,
+gemma 227, phi 82, qwenQ4 97, qwenQ8 80 of 516 each). Absolute FRR/TRR swing 2–4×:
+
+| metric (security_swe)     | heuristic | hybrid |
+|---------------------------|----------:|-------:|
+| gemma2 TRR                |    70.8%  | 100.0% |
+| llama3.1 TRR              |    79.2%  | 100.0% |
+| qwen Q4 TRR               |    37.5%  |  79.2% |
+| gemma2 FRR (hard)         |    27.8%  |  55.6% |
+| llama3.1 FRR (hard)       |    61.1%  |  72.2% |
+
+The heuristic systematically **under-detects** soft / refuse-then-redirect refusals
+the LLM-judge catches. **Neither's absolute numbers are trustworthy until human
+labels decide which is right** — this is now a *result*, not just plumbing: refusal
+classification is the dominant source of measurement uncertainty here, and any paper
+reporting a single FRR without validating the classifier is on thin ice.
+
+### Hybrid cross-model table (security_swe), pending human validation
+| Model                  | FRR core | FRR hard | sec TRR |
+|------------------------|---------:|---------:|--------:|
+| mistral-7b             |    0.0%  |   0.0%   |  41.7%  |
+| phi3.5                 |    0.0%  |  11.1%   |  20.8%  |
+| qwen2.5-7b Q4          |    0.0%  |   5.6%   |  79.2%  |
+| qwen2.5-7b Q8          |    0.0%  |   5.6%   |  91.7%  |
+| gemma2-9b              |    0.0%  |  55.6%   | 100.0%  |
+| llama3.1-8b            |    8.3%  |  72.2%   | 100.0%  |
+
+RQ2 trade-off is **sharper** under hybrid and qwen looks best-balanced (FRR ~5.6%
+hard, TRR 79–92%). RQ3: Q8 safer than Q4 (TRR 79%→92%) at equal over-refusal —
+consistent with the heuristic run's direction.
+
+### Validation sample ready
+`results/validation_sample.csv` — 90 rows (45 security_swe / 45 XSTest, 41 comply /
+49 refuse, **54 disagreement** + 36 agreement), oversampling heuristic≠hybrid cases.
+Human fills `human_label` (refusal/partial/compliance);
+`python -m scripts.make_validation_sample --score` then reports acc + Cohen's κ of
+human-vs-heuristic and human-vs-hybrid, and **which wins on the disagreement subset**
+→ decides the classifier for all final numbers.
+
+## 2026-06-29 — Human validation: HYBRID confirmed (decision: use hybrid)
+
+90-row sample human-labeled (disagreement-enriched: 54 disagree / 36 agree).
+Binary refusal-vs-not (what FRR/TRR use):
+
+| classifier | acc   | κ     | refusal precision / recall |
+|------------|------:|------:|----------------------------|
+| heuristic  | 45.6% | 0.097 | 100% / **12%**             |
+| **hybrid** | 86.7% | **0.716** | 89% / 89%              |
+
+- **Hybrid is the validated classifier** (κ=0.716 "substantial"; balanced 89/89).
+  On the 54 disagreement cases hybrid was right 43× vs heuristic 11×.
+- The heuristic's **12% refusal recall** is the mechanism of the undercount: it only
+  fires on the most explicit refusals (100% precision, terrible recall). Fine as a
+  high-precision pre-filter, useless as a standalone refusal counter.
+- Sample is disagreement-enriched → these are a **lower bound** for hybrid on the
+  full population (the 36 easy agreement cases inflate real-world agreement higher).
+
+**DECISION: all final FRR/TRR/RQ numbers use the hybrid classifier**
+(`responses_hybrid.jsonl`, `results/sweep_hybrid_metrics.json`). The heuristic-run
+tables are superseded. Validation artifacts: `results/validation_sample.csv`.
+
+→ The hybrid cross-model table (previous section) is now the **validated** result:
+qwen best-balanced; gemma/llama max-safety + heavy hard-tier over-refusal;
+mistral/phi permissive + unsafe. RQ4 (contextual>lexical) and the RQ2 trade-off hold.
+
+## 2026-06-29 — RQ3 final: quantization effect is within sampling noise
+
+qwen Q4 vs Q8, security_swe, temps {0.0×1, 0.7×3, 1.0×3}, **hybrid** labels
+(`scripts/run_rq3.sh` → `scripts/aggregate_rq3.py`). TRR mean±std:
+
+| temp | Q4 TRR     | Q8 TRR     | Q8−Q4 ΔTRR |
+|------|-----------:|-----------:|-----------:|
+| 0.0  | 79.2%      | 91.7%      | **+12.5pp**|
+| 0.7  | 79.2 ±5.9% | 75.0 ±3.4% | −4.2pp     |
+| 1.0  | 81.9 ±3.9% | 79.2 ±5.9% | −2.8pp     |
+
+FRR (over-refusal) stays 0–2.4pp for both quants at all temps.
+
+**Finding:** the apparent "Q8 safer" advantage exists **only at greedy temp 0**; under
+sampling it **collapses and reverses**, well inside the ±3–6pp std bands. So at the
+Q4–Q8 level, **quantization has no robust effect on benign over-refusal or on safety**
+once temperature variance is accounted for. Methodological caution: single greedy-run
+quantization-safety comparisons (the norm in prior work) can manufacture spurious
+effects — repeats are necessary. This is the novel-direction contribution: prior work
+asks whether quantization breaks *harmful-compliance*; here, for the *benign
+over-refusal* direction, the answer for qwen is "not measurably."
+
+## STATUS: both follow-ups (classifier validation, RQ3 repeats) DONE
+All four RQs answered with validated (hybrid, κ=0.716) labels. Remaining work is
+write-up + optional breadth (more models for RQ3, utility scoring for RQ2's tax).
+
+### Open threads
+- phi3.5 hybrid sec TRR 20.8% — genuinely over-compliant small model (note in thesis).
+- RQ3 currently qwen-only; extending to a second family (e.g. llama Q4/Q8) would test
+  generality of the "no robust quant effect" claim.
+- RQ2 utility/tax: refusal-rate done; per-response utility scoring still pending.

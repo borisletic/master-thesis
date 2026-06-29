@@ -28,8 +28,8 @@ _REPO = Path(__file__).resolve().parents[1]
 _RESULTS = _REPO / "results"
 
 
-def _load_dir(d: Path) -> list[dict]:
-    f = d / "responses.jsonl"
+def _load_dir(d: Path, name: str = "responses.jsonl") -> list[dict]:
+    f = d / name
     if not f.exists():
         return []
     return [json.loads(l) for l in f.open(encoding="utf-8") if l.strip()]
@@ -43,15 +43,17 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--glob", default="*sweep*", help="dir glob under results/")
     ap.add_argument("--dirs", nargs="*", help="explicit run dirs (overrides --glob)")
+    ap.add_argument("--responses-name", default="responses.jsonl",
+                    help="which responses file to read (e.g. responses_hybrid.jsonl)")
     ap.add_argument("--by-tier", action="store_true", help="split security_swe by core/hard tier")
     ap.add_argument("--by-xstest-type", action="store_true", help="XSTest FRR by prompt type")
     ap.add_argument("--out", default=None, help="write combined metrics JSON here")
     args = ap.parse_args(argv)
 
     dirs = [Path(d) for d in args.dirs] if args.dirs else sorted(_RESULTS.glob(args.glob))
-    dirs = [d for d in dirs if (d / "responses.jsonl").exists()]
+    dirs = [d for d in dirs if (d / args.responses_name).exists()]
     if not dirs:
-        print(f"[error] no run dirs with responses.jsonl (glob={args.glob!r})")
+        print(f"[error] no run dirs with {args.responses_name} (glob={args.glob!r})")
         return 1
 
     tier = {p.id: p.tier for p in load_security_swe()}
@@ -59,7 +61,7 @@ def main(argv: list[str] | None = None) -> int:
     # gather all rows, tag tier
     all_rows: list[dict] = []
     for d in dirs:
-        for r in _load_dir(d):
+        for r in _load_dir(d, args.responses_name):
             r["tier"] = tier.get(r["prompt_id"], "core")
             all_rows.append(r)
 

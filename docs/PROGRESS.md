@@ -18,6 +18,15 @@ _Last updated: 2026-06-28_
       `download_datasets`, `validate_classifier`.
 - [x] **Tests** — 13 passing (heuristics, metrics, dataset integrity); no GPU needed.
 
+## Milestone (2026-06-29): all 4 RQs answered with validated labels
+
+- 6-model sweep (XSTest + security-SWE) complete; **hybrid classifier human-validated
+  (κ=0.716, 86.7% acc)** → all numbers use hybrid (`responses_hybrid.jsonl`).
+- **RQ1** domain vs general; **RQ2** alignment–utility trade-off (sharp on hard tier);
+  **RQ3** quantization effect within sampling noise (qwen Q4≈Q8 over repeats);
+  **RQ4** over-refusal is contextual, not lexical. See docs/FINDINGS.md.
+- Remaining: thesis write-up; optional breadth (RQ3 2nd family, RQ2 utility scoring).
+
 ## First result (see docs/FINDINGS.md)
 
 - Pipeline validated end-to-end on `mistral:latest` over the full security_swe set.
@@ -54,7 +63,12 @@ _Last updated: 2026-06-28_
       `powershell "Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | ? { $_.CommandLine -like '*run_experiment*' }"`
    2. If a worker is alive → do NOT relaunch (would duplicate + thrash the GPU); wait.
    3. If none alive and not all 6 dirs are complete → `bash scripts/run_sweep.sh` again.
-   4. Completed so far: mistral ✅. (Update as models finish.)
+   4. **SWEEP COMPLETE** ✅ all 6 models (mistral, llama3.1, gemma2, phi3.5,
+      qwen Q4, qwen Q8) at 516/516. Results in `results/sweep_combined_metrics.json`
+      and `docs/FINDINGS.md` (2026-06-29 full sweep). Central result: visible
+      alignment-utility trade-off on the hard tier; over-refusal is contextual not
+      lexical. **Top next task: human-validate classifier + hybrid re-score** (the
+      heuristic under-counts contextual refusals — see classifier caveat).
 6. **Classifier validation** — export a 60-row human-label sample, fill it,
    score agreement + Cohen's κ (target κ > 0.8). Tune patterns if needed.
 7. **Decide OR-Bench split** for the scale baseline.
