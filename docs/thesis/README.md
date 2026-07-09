@@ -1,4 +1,4 @@
-# Thesis — Evaluating Over-Refusal and the Alignment–Utility Trade-off in Small Local Language Models
+# Thesis — Evaluating Over-Refusal and the Alignment–Utility Trade-off in Resource-Constrained Local Language Models
 
 Domain: security software engineering. Language: English. Draft, chapter-by-chapter
 Markdown. All quantitative claims use the **human-validated hybrid classifier**

@@ -1,7 +1,7 @@
 # Thesis outline
 
 Working title: **Evaluating Over-Refusal and the Alignment–Utility Trade-off in
-Small Local Language Models** (security software-engineering domain).
+Resource-Constrained Local Language Models** (security software-engineering domain).
 
 1. **Introduction**
    - Over-refusal / exaggerated safety; why it matters for security-SWE.

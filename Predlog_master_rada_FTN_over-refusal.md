@@ -1,8 +1,8 @@
 # Predlog master rada
 
-**Radni naslov:** Procena prekomernog odbijanja i kompromisa između usklađenosti i korisnosti kod malih lokalnih jezičkih modela
+**Radni naslov:** Procena prekomernog odbijanja i kompromisa između usklađenosti i korisnosti kod resursno ograničenih lokalnih jezičkih modela
 
-*(Evaluating Over-Refusal and the Alignment–Utility Trade-off in Small Local Language Models)*
+*(Evaluating Over-Refusal and the Alignment–Utility Trade-off in Resource-Constrained Local Language Models)*
 
 **Oblast:** Trustworthy AI / efikasni lokalni jezički modeli (procena pouzdanosti i bezbednosnog ponašanja jezičkih modela pod ograničenjima resursa); domen evaluacije: bezbednosni inženjering softvera
 

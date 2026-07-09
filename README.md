@@ -1,4 +1,4 @@
-# Evaluating Over-Refusal and the Alignment–Utility Trade-off in Small Local Language Models
+# Evaluating Over-Refusal and the Alignment–Utility Trade-off in Resource-Constrained Local Language Models
 
 Master thesis project (FTN). Systematic evaluation of **over-refusal** ("exaggerated
 safety") in small, locally-deployable, quantized language models, focused on the
