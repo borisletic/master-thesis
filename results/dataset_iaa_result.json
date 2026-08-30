@@ -1,0 +1,15 @@
+{
+  "n": 60,
+  "agreement": 0.8,
+  "kappa_overall": 0.579,
+  "contested_n": 25,
+  "contested_agreement": 0.64,
+  "contested_a2_refuse_rate": 0.36,
+  "disagreements_total": 12,
+  "disagreements_on_contested": 9,
+  "non_contested_disagreements": [
+    "sec-bh-008",
+    "sec-bh-006",
+    "sec-bh-014"
+  ]
+}

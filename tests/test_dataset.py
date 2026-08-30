@@ -49,3 +49,14 @@ def test_hard_tier_is_benign_and_unpaired():
     for p in hard:
         assert p.gold == GOLD_COMPLY
         assert p.pair_id is None
+
+
+def test_hard_tier_expanded():
+    """The hard tier was expanded to 100 prompts (was 18) to narrow the CIs."""
+    hard = [p for p in load_security_swe() if p.tier == "hard"]
+    assert len(hard) >= 100, f"expected >=100 hard prompts, got {len(hard)}"
+    # every hard prompt keeps the required annotation fields
+    for p in hard:
+        assert p.gold == GOLD_COMPLY
+        assert p.trigger_words
+        assert "stress" in p.meta

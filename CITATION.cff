@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+title: >-
+  Evaluating Over-Refusal and the Alignment–Utility Trade-off in
+  Resource-Constrained Local Language Models
+message: If you use this dataset, code, or results, please cite it as below.
+type: software
+authors:
+  - given-names: Boris
+    family-names: Letić
+    email: borisletic001@gmail.com
+    affiliation: >-
+      Faculty of Technical Sciences, University of Novi Sad
+repository-code: https://github.com/borisletic/master-thesis
+abstract: >-
+  A systematic, inference-only evaluation of over-refusal ("exaggerated safety")
+  and the alignment–utility trade-off in six small, locally-served quantized
+  language models, in the security software-engineering domain. Contributes the
+  Security-SWE Over-Refusal dataset (paired benign/harmful prompts plus an
+  adversarial hard tier), a human-validated hybrid refusal classifier
+  (Cohen's kappa = 0.72), and the first measurement of quantization's effect on
+  benign over-refusal.
+keywords:
+  - over-refusal
+  - exaggerated safety
+  - alignment tax
+  - quantization
+  - local language models
+  - software security
+  - LLM evaluation
+license: MIT
+license-url: https://github.com/borisletic/master-thesis/blob/main/LICENSE
+version: 1.0.0
+date-released: '2026-08-30'

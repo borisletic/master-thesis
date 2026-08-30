@@ -337,3 +337,110 @@ the 8 GB card (~3× slower than Q4) — a real deployment cost for marginal/no b
 
 ## STATUS: ALL experiments done — RQ1–RQ4 answered, RQ2 two-dimensional, RQ3 ×2 families
 Next: thesis write-up. (Further-optional: second utility grader to de-bias quality.)
+
+
+## 2026-08-30 — Statistical audit, citation audit, artifacts (Level 1)
+
+### Statistical treatment (new: `src/orr/evaluation/stats.py`, `scripts/analyze_stats.py`)
+Point estimates alone overstated what n=18 (hard tier) / n=24 (harmful) supports.
+95% Wilson intervals are **18–42 pp wide** on the hard tier. Fisher exact tests
+with Holm-Bonferroni correction: **7 of 15** pairwise comparisons survive, in each
+of FRR and TRR.
+
+- **Supported:** the three-group split — permissive/unsafe (mistral, phi-3.5),
+  balanced (qwen Q4/Q8), max-safety/over-refusing (gemma2, llama3.1).
+- **NOT supported:** fine ranking within groups. gemma2 vs llama3.1 FRR p=0.489;
+  mistral vs phi-3.5 p=0.486; qwen Q4 vs Q8 p=1.000 (FRR) / 0.416 (TRR).
+- The qwen Q4/Q8 null **strengthens RQ3**: the no-effect conclusion now rests on
+  temperature repeats *and* an exact test, not on a single absent difference.
+
+All claims in the thesis were softened accordingly (new section 7.3).
+
+### Citation audit — 4 errors found and fixed
+Every reference was checked against its arXiv/proceedings record:
+
+| ref | problem | correction |
+|-----|---------|------------|
+| [3] | **wrong title** | not "Alignment-Aware Quantization for LLM Safety" → *Safety-Preserving PTQ via Contrastive Alignment Loss*, Wee, Kim, Kim, Hwang, Kwak |
+| [4] | missing authors | Yuan, Nie, Sun, Zhao, LaCroix, Färber |
+| [5] | truncated title, no authors | *…Across Models and Precision Levels*, Rath & Maliakkal |
+| [2] | wrong venue | OR-Bench is ICML 2025, PMLR 267, 11515–11542 (arXiv:2405.20947) |
+
+Added three recent works that were missing: SORRY-Bench [16], intent-clarification
+utility recovery [17], adaptive contrastive decoding [18]. [17] matters
+substantively — it validates the intent-clarification mitigation this thesis
+proposes from the contextual-refusal finding.
+
+**Important lead from [5]:** that work finds bias emergence at **3-bit**
+quantization (6–21% of items). This thesis tested only Q4 vs Q8 — i.e. the range
+where no effect was expected. Extending to Q3/Q2 is the highest-value next
+experiment, and the null result here is consistent with, not contrary to, [5].
+
+### Artifacts
+LICENSE (MIT code / CC BY 4.0 data+results), CITATION.cff, four figures with
+visible uncertainty (`docs/figures/`), 8 new statistics tests (24 total).
+
+## 2026-08-30 — Inter-annotator agreement on the dataset (Level 2, item 7)
+
+Second annotation of a 60-item stratified sample (25 contested + 15 harmful + 20
+other), scored via `scripts/dataset_iaa.py`:
+
+- **Overall: 80.0% agreement, Cohen's κ = 0.579** (moderate; Landis-Koch 0.41–0.60).
+- **9 of 12 disagreements fall on contested prompts** — the `contested` flag
+  captures the hard cases, as intended.
+- On the 25 contested prompts, the second annotator took the conservative
+  should-refuse view on **36% (9/25)** — empirically validating that these are
+  genuinely debatable. (κ on that subset is 0.000, but that is an artifact: the
+  gold labels are constant there — all should_comply — so κ has no variance to
+  measure; the meaningful number is the 36% refuse rate.)
+- 3 non-contested disagreements — sec-bh-006 (crack own zip), sec-bh-008 (detonate
+  live ransomware for IR), sec-bh-014 (sniff own network) — candidates for
+  re-review or re-flagging as contested.
+
+Result saved to `results/dataset_iaa_result.json`. Replaces the earlier
+"single-annotator" limitation. (First pass returned κ=1.000 while the gold column
+was visible; re-annotated independently for the credible number above.)
+
+## 2026-08-31 — Level 2 complete (n=100, precision ladder, IAA, independent grader)
+
+### Item 6 — hard tier 18 -> 100
+Re-ran all 6 models on 82 new hard prompts (scripts/run_hard2.py + gen_hard_v2.py).
+Hard-tier CIs collapsed **18–42pp -> 4–17pp**. Point estimates also SHIFTED — the
+original 18 were a high-biased sample:
+
+| FRR hard | n=18 | n=100 [95% CI] |
+|----------|-----:|----------------|
+| llama3.1 | 72.2%| 26.0% [18–35] |
+| gemma2   | 55.6%| 16.0% [10–24] |
+| qwen Q4  | 5.6% | 1.0% [0.2–5] |
+
+8/15 FRR comparisons and 7/15 TRR comparisons survive Holm correction. Three-group
+split holds (gemma2 vs llama3.1 still n.s., p=0.118).
+
+### Item 5 — Q3/Q2 precision ladder (RQ3 UPGRADED)
+Pulled qwen+llama in Q3_K_M and Q2_K; ran the temperature design on the same 66.
+TRR ladder (pooled):
+
+| family | Q8 | Q4 | Q3 | Q2 | Q8 vs Q2 |
+|--------|---:|---:|---:|---:|----------|
+| llama3.1 | 99% | 100% | 99% | 95% | p=0.020 **significant** |
+| qwen2.5  | 79% | 80% | 72% | 70% | p=0.060 borderline |
+
+**The Level-1 "no quantization effect" was only true for the Q4–Q8 range.** Safety
+holds through Q3, then degrades at 2-bit — significant for llama, trending for qwen.
+FRR stays low throughout. Confirms ref [5] (effects at aggressive quantization) and
+locates the boundary: Q4 is safe, Q2 is not. New: scripts/analyze_ladder.py,
+results/ladder.json, docs/figures/fig5_ladder.png.
+
+### Item 7 — inter-annotator κ = 0.579 (see 2026-08-30 entry)
+
+### Item 8 — independent utility grader
+gemma2 re-graded the benign responses qwen graded. **Pearson r = 0.846, MAD = 0.054.**
+Ranking stable; gemma2 grades qwen slightly LOWER than qwen self-grades, so no
+self-preference inflation. Quality conclusions robust to grader choice.
+results/grader_agreement.json, scripts/compare_graders.py.
+
+### Documents
+Thesis rebuilt: 50 pages, 21 tables, 5 figures. Paper: 4 pages. 25 tests pass.
+All n=18 headline numbers replaced with validated n=100 throughout; RQ3 section and
+conclusion revised for the ladder; limitations now report real IAA + grader check.

@@ -1,0 +1,5 @@
+{
+  "pearson": 0.846,
+  "mad": 0.054,
+  "note": "gemma2 vs qwen grader; ranking stable, no self-preference"
+}

@@ -30,7 +30,11 @@ for m in "${MODELS[@]}"; do
       if [ "$have" -ge "$EXPECTED" ]; then echo "=== SKIP $tagsuffix ($have rows) ==="; continue; fi
       [ "$have" -gt 0 ] && rm -rf results/*"$tagsuffix"
       echo "=== RQ3 $m temp=$temp rep=$rep seed=$seed ==="
-      python -m scripts.run_experiment --models "$m" --datasets security_swe \
+      # --limit 66 pins the RQ3 ladder to the ORIGINAL prompt set (core 48 + first
+      # 18 hard). The hard tier was later expanded to 100; without the limit the
+      # Q3/Q2 runs would see 148 prompts and not be comparable to the earlier
+      # Q4/Q8 runs. The first 66 in load order are exactly the original set.
+      python -m scripts.run_experiment --models "$m" --datasets security_swe --limit 66 \
         --temperature "$temp" --seed "$seed" --classify heuristic --tag "$tagsuffix" \
         || echo "[warn] $tagsuffix failed"
     done

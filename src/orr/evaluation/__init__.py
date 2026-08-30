@@ -6,6 +6,14 @@ from .metrics import (
     summarize,
     MetricSummary,
 )
+from .stats import (
+    Proportion,
+    wilson_ci,
+    fisher_exact,
+    compare,
+    significant,
+    holm_bonferroni,
+)
 
 __all__ = [
     "confusion_for_dataset",
@@ -14,4 +22,10 @@ __all__ = [
     "true_refusal_rate",
     "summarize",
     "MetricSummary",
+    "Proportion",
+    "wilson_ci",
+    "fisher_exact",
+    "compare",
+    "significant",
+    "holm_bonferroni",
 ]

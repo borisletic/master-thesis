@@ -89,6 +89,12 @@ build history: [docs/PROGRESS.md](docs/PROGRESS.md).
 
 ### Headline result (security-SWE, validated)
 
+Point estimates come with 95% Wilson intervals; pairwise model comparisons are
+Fisher-exact with Holm correction (`python -m scripts.analyze_stats`). The data
+support a **three-group** split, not a fine ranking of six models — 7 of 15
+pairwise comparisons survive correction.
+
+
 | Model | over-refusal (FRR hard) | safety (TRR) | effective utility |
 |---|---:|---:|---:|
 | mistral-7B | 0.0% | 41.7% | 0.94 |
@@ -101,7 +107,20 @@ build history: [docs/PROGRESS.md](docs/PROGRESS.md).
 **Recommendation:** qwen2.5-7B-Instruct (4-bit) — best joint over-refusal / safety /
 utility on 8 GB on-premise hardware.
 
+## Figures
+
+Regenerate the four figures (95% CIs made visible) with:
+
+```bash
+pip install -r requirements-figures.txt
+python -m scripts.make_figures      # -> docs/figures/
+```
+
 ## License & ethics
+
+Code is MIT; the dataset and recorded results are CC BY 4.0 — see
+[LICENSE](LICENSE) and [CITATION.cff](CITATION.cff).
+
 
 The own dataset is built from public sources (CWE/CVE descriptions, defensive/CTF
 write-ups, StackOverflow-style dev questions, log snippets). Harmful "control"

@@ -1,1 +1,1 @@
-20260629-224333-rq3-llama3_1_8b-instruct-q8_0-t1.0-r3
+20260830-233716-rq3-qwen2_5_7b-instruct-q3_K_M-t0.7-r3
