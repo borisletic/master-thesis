@@ -93,7 +93,7 @@ def main(argv=None) -> int:
     print(f"\n[written] {_RESULTS / 'mitigation.json'}")
 
     # LaTeX snippet for the paper
-    tex = [r"\begin{table}[h]\centering\small",
+    tex = [r"\begin{table}[H]\centering\small",
            r"\caption{Defensive system prompt: hard-tier over-refusal (FRR) drops "
            r"while safety (TRR) is retained. FRR $p$ is a Fisher exact test.}",
            r"\label{tab:mitig}",
@@ -112,7 +112,7 @@ def main(argv=None) -> int:
         tex.append(
             f"The defensive system prompt lowers hard-tier over-refusal "
             f"({drops}) while the true-refusal rate on harmful controls stays at "
-            f"\\SI{{100}}{{\\percent}} for both models (Table~\\ref{{tab:mitig}}). "
+            f"100\\% for both models (Table~\\ref{{tab:mitig}}). "
             f"The reduction is substantial for gemma2 (halved, $p=0.07$) and modest "
             f"for llama3.1 ($p=0.51$); it is a partial, training-free improvement "
             f"rather than a cure. Two points nonetheless hold cleanly: the "

@@ -11,6 +11,8 @@
 \usepackage{xcolor}
 \usepackage{hyperref}
 \usepackage{caption}
+\usepackage{float}      % [H] exact placement
+\usepackage{flafter}    % floats never appear before their reference
 \hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue}
 \graphicspath{{figures/}}
 \captionsetup{font=small}
@@ -191,7 +193,7 @@ heuristic vs.\ 79.2\% hybrid). On the human-labelled sample
 ($\kappa=0.72$), balanced at 89/89. Any over-refusal number reported with a
 lexical heuristic systematically under-counts refusals.
 
-\begin{table}[t]\centering\small
+\begin{table}[H]\centering\small
 \caption{Classifier agreement with human labels (binary refusal-vs-not).}
 \label{tab:clf}
 \begin{tabular}{lrrr}
@@ -215,7 +217,7 @@ $4$--$17$\,pp and \textbf{8 of 15} pairwise FRR comparisons survive Holm
 correction; the data support a \emph{three-group} split but not a fine ranking
 within groups (gemma2 vs.\ llama3.1: $p=0.12$).
 
-\begin{table}[t]\centering\small
+\begin{table}[H]\centering\small
 \caption{Security-SWE results (hard tier $n=100$, validated hybrid labels).
 Quality and effective utility are on the original 42-benign set.}
 \label{tab:main}
@@ -233,7 +235,7 @@ llama3.1-8B     & 8.3\% & 26.0\% & 100.0\%& \textbf{0.98} & \textbf{0.63} \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[t]\centering
+\begin{figure}[H]\centering
 \includegraphics[width=0.72\linewidth]{fig1_tradeoff.png}
 \caption{Over-refusal vs.\ retained safety with 95\% Wilson intervals. Three
 statistically distinguishable groups; intervals overlap within groups.}
@@ -248,7 +250,7 @@ and the worst effective utility ($0.63$)} because it refuses a quarter of benign
 tasks. Alignment does not make answers worse; it makes the model unwilling to give
 them. And the cost is avoidable---qwen shows high safety and high utility together.
 
-\begin{figure}[t]\centering
+\begin{figure}[H]\centering
 \includegraphics[width=0.7\linewidth]{fig4_utility.png}
 \caption{The alignment tax: quality when the model answers vs.\ effective utility
 (refusals count as $0$). The gap is helpfulness destroyed by refusing.}
@@ -267,7 +269,7 @@ the residual refusals are the contextually fraught hard-tier cases
 (attacker-roleplay, sniffing one's own credentials), where even a human reviewer
 might hesitate.
 
-\begin{figure}[t]\centering
+\begin{figure}[H]\centering
 \includegraphics[width=0.85\linewidth]{fig2_xstest_types.png}
 \caption{XSTest FRR by prompt type. Lexical types (bold) are uniformly low;
 refusals concentrate on sensitive topics.}
@@ -286,7 +288,7 @@ flat through 3-bit, then drops at 2-bit---llama3.1 from 99 to
 helpfulness. This confirms and sharpens~\cite{rath2026}: the commonly-used 4-bit
 weights are safe; 2-bit is not.
 
-\begin{table}[t]\centering\small
+\begin{table}[H]\centering\small
 \caption{TRR (\%) along the precision ladder, pooled over temperatures.}
 \label{tab:ladder}
 \begin{tabular}{lrrrrl}
@@ -299,7 +301,7 @@ qwen2.5-7B  & 79 & 80  & 72 & 70 & $p=0.060$ (borderline) \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[t]\centering
+\begin{figure}[H]\centering
 \begin{minipage}{0.49\linewidth}\centering
 \includegraphics[width=\linewidth]{fig3_quantization.png}
 \caption{Q4 vs.\ Q8 across temperature; the greedy-decoding advantage vanishes.}

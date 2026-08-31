@@ -32,3 +32,12 @@ Thumbs.db
 # Local secrets / overrides
 .env
 config/local.yaml
+
+# LaTeX build artifacts (keep main.pdf, drop the rest)
+docs/arxiv/*.aux
+docs/arxiv/*.log
+docs/arxiv/*.out
+docs/arxiv/*.synctex.gz
+docs/arxiv/*.toc
+docs/arxiv/*.fls
+docs/arxiv/*.fdb_latexmk
