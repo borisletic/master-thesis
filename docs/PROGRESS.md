@@ -91,3 +91,17 @@ _Last updated: 2026-06-28_
 - OR-Bench split: hard-1k vs the full 80k (cost vs coverage).
 - Utility scoring for RQ2: rubric-based LLM grader vs manual rubric on a subsample.
 - Whether to add a system-prompt arm (XSTest showed system prompts flip behavior).
+
+## Level 3 (2026-08-31): PhD / Big-Tech readiness
+
+- **System-prompt mitigation** (intervention study): `scripts/run_mitigation.py`
+  re-runs the two over-refusing models with a defensive-role system prompt;
+  `scripts/analyze_mitigation.py` compares FRR-hard/TRR before vs after with a
+  Fisher test and emits the paper snippet. (Motivated by the contextual-refusal
+  finding — a training-free fix.)
+- **English arXiv preprint**: `docs/arxiv/main.tex` (self-contained LaTeX, standard
+  packages, inline bibliography, 5 figures). Structure validated (envs/braces
+  balanced, all figures/citations resolve). Compile on arXiv/Overleaf.
+- **Repo hardening**: GitHub Actions CI (`.github/workflows/ci.yml`, tests on
+  py3.11/3.12), HuggingFace dataset card (`data/security_swe/README.md`),
+  arXiv build README.
