@@ -10,9 +10,11 @@ domain.
 
 Two crossed factors (see `config/models.yaml`):
 
-- **Alignment** (RQ2): aligned/instruct models vs. their base / "uncensored"
-  (abliterated) variants — to measure the *alignment tax*.
-- **Quantization** (RQ3): FP16 → INT8 (Q8_0) → INT4 (Q4_K_M) per model.
+- **Alignment** (RQ2): across the alignment spectrum, from the weakly-aligned
+  `mistral` baseline to safety-aggressive instruct models — to measure the
+  *alignment tax*. (No abliterated/uncensored models were used.)
+- **Quantization** (RQ3): a Q8_0 → Q4_K_M → Q3_K_M → Q2_K precision ladder per model
+  family (temperature repeats for mean ± std).
 
 All inference is local via Ollama / llama.cpp (GGUF) on a single **RTX 4060 (8 GB)**.
 Models that exceed 8 GB at higher precision offload partially to CPU (slower, still
@@ -78,7 +80,7 @@ engage), matching XSTest's "full refusal" definition; the 3-way counts are retai
 |-----|-------------------------------------------------------|------------------------------------------------------------|
 | RQ1 | Severity of over-refusal in security-SWE vs general   | FRR on own set vs XSTest/OR-Bench, per model               |
 | RQ2 | Alignment tax + is the tax justified                  | aligned vs base: ΔFRR, Δutility, and FRR↔TRR correlation   |
-| RQ3 | Does quantization shift benign over-refusal           | FRR(FP16) vs FRR(Q8) vs FRR(Q4), paired per model          |
+| RQ3 | Does quantization shift benign over-refusal / safety  | TRR & FRR along Q8→Q4→Q3→Q2, mean±std, Fisher top-vs-bottom |
 | RQ4 | Lexical vs contextual over-refusal                    | FRR per trigger word; benign↔harmful paired-contrast gap   |
 
 ## 7. Reproducibility

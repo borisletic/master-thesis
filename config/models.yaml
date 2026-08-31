@@ -1,84 +1,78 @@
-# Model matrix for the over-refusal study.
+# Model matrix actually evaluated in the study.
 #
 # Two crossed dimensions:
-#   - alignment: aligned/instruct vs. base/uncensored (RQ2, "alignment tax")
-#   - quantization: FP16 -> INT8 (Q8) -> INT4 (Q4_K_M) (RQ3)
+#   - alignment (RQ2): from weakly-aligned (mistral) to safety-aggressive
+#     (gemma2, llama3.1). No abliterated/uncensored models were used.
+#   - quantization (RQ3): a Q8_0 -> Q4_K_M -> Q3_K_M -> Q2_K precision ladder on the
+#     two instruct families (qwen2.5-7B, llama3.1-8B).
 #
-# `ollama_tag` is what `ollama pull` / the API expects. Tags marked `available: false`
-# are aspirational targets — flip to true once pulled. Some FP16 7-9B models do NOT
-# fit in 8 GB VRAM and will offload to CPU (slower but still runs); noted per-entry.
+# `ollama_tag` is what `ollama pull` / the API expects. `approx_vram_gb` notes fit
+# on the 8 GB RTX 4060; entries over ~8 GB offload partially to CPU (~3x slower).
+#
+# Note: this file documents the matrix; the pipeline takes model tags on the CLI
+# (see scripts/run_sweep.sh, run_rq3.sh) rather than loading this YAML.
 
 defaults:
   temperature: 0.0          # primary runs are greedy/deterministic
   num_predict: 512          # max new tokens
   seed: 42
-  # for the stochastic robustness runs (reported as mean ± std):
+  # RQ3 stochastic-robustness runs (reported as mean +/- std):
   repeat_temperatures: [0.0, 0.7, 1.0]
-  repeats_per_temperature: 1
+  repeats_per_temperature: [1, 3, 3]   # 1 at T=0 (deterministic), 3 each at 0.7/1.0
 
-models:
-  # ---------------- Qwen2.5 7B ----------------
+# ---- cross-model sweep (RQ1/RQ2/RQ4): six configurations, Q4_K_M unless noted ----
+sweep:
+  - family: mistral-7b
+    alignment: weak
+    ollama_tag: mistral:latest
+    quant: q4_K_M
+    approx_vram_gb: 4.4
+  - family: phi3.5-mini
+    alignment: instruct
+    ollama_tag: phi3.5:3.8b-mini-instruct-q4_0
+    quant: q4_0
+    approx_vram_gb: 2.5
   - family: qwen2.5-7b
     alignment: instruct
-    variants:
-      - quant: q4_K_M
-        ollama_tag: qwen2.5:7b-instruct-q4_K_M
-        approx_vram_gb: 5.0
-        available: false
-      - quant: q8_0
-        ollama_tag: qwen2.5:7b-instruct-q8_0
-        approx_vram_gb: 8.5      # borderline on 8GB; partial CPU offload
-        available: false
-      - quant: fp16
-        ollama_tag: qwen2.5:7b-instruct-fp16
-        approx_vram_gb: 15.0     # CPU offload on 8GB
-        available: false
-
-  # ---------------- Llama 3.1 8B ----------------
+    ollama_tag: qwen2.5:7b-instruct-q4_K_M
+    quant: q4_K_M
+    approx_vram_gb: 5.0
+  - family: qwen2.5-7b
+    alignment: instruct
+    ollama_tag: qwen2.5:7b-instruct-q8_0
+    quant: q8_0
+    approx_vram_gb: 8.1        # borderline; partial CPU offload
   - family: llama3.1-8b
     alignment: instruct
-    variants:
-      - quant: q4_K_M
-        ollama_tag: llama3.1:8b-instruct-q4_K_M
-        approx_vram_gb: 5.5
-        available: false
-      - quant: q8_0
-        ollama_tag: llama3.1:8b-instruct-q8_0
-        approx_vram_gb: 9.0
-        available: false
-
-  # ---------------- Gemma 2 9B ----------------
+    ollama_tag: llama3.1:8b-instruct-q4_K_M
+    quant: q4_K_M
+    approx_vram_gb: 5.5
   - family: gemma2-9b
     alignment: instruct
-    variants:
-      - quant: q4_K_M
-        ollama_tag: gemma2:9b-instruct-q4_K_M
-        approx_vram_gb: 6.5
-        available: false
+    ollama_tag: gemma2:9b-instruct-q4_K_M
+    quant: q4_K_M
+    approx_vram_gb: 6.5
 
-  # ---------------- Phi (small) ----------------
-  - family: phi3.5
-    alignment: instruct
-    variants:
-      - quant: q4_K_M
-        ollama_tag: phi3.5:3.8b-mini-instruct-q4_K_M
-        approx_vram_gb: 2.5
-        available: false
+# ---- RQ3 precision ladder: Q8 -> Q4 -> Q3 -> Q2 on two families ----
+rq3_ladder:
+  qwen2.5-7b:
+    - {quant: q8_0,   ollama_tag: qwen2.5:7b-instruct-q8_0,   approx_vram_gb: 8.1}
+    - {quant: q4_K_M, ollama_tag: qwen2.5:7b-instruct-q4_K_M, approx_vram_gb: 5.0}
+    - {quant: q3_K_M, ollama_tag: qwen2.5:7b-instruct-q3_K_M, approx_vram_gb: 4.0}
+    - {quant: q2_K,   ollama_tag: qwen2.5:7b-instruct-q2_K,   approx_vram_gb: 3.2}
+  llama3.1-8b:
+    - {quant: q8_0,   ollama_tag: llama3.1:8b-instruct-q8_0,   approx_vram_gb: 8.5}
+    - {quant: q4_K_M, ollama_tag: llama3.1:8b-instruct-q4_K_M, approx_vram_gb: 5.5}
+    - {quant: q3_K_M, ollama_tag: llama3.1:8b-instruct-q3_K_M, approx_vram_gb: 4.7}
+    - {quant: q2_K,   ollama_tag: llama3.1:8b-instruct-q2_K,   approx_vram_gb: 3.6}
 
-  # ---------------- Base / uncensored contrasts (RQ2) ----------------
-  # These approximate the "less-aligned" arm. Abliterated community models are
-  # used as a proxy for "alignment removed"; document provenance in the thesis.
-  - family: llama3.1-8b
-    alignment: uncensored
-    variants:
-      - quant: q4_K_M
-        ollama_tag: "huihui_ai/llama3.1-abliterated:8b-q4_K_M"
-        approx_vram_gb: 5.5
-        available: false
-
-# Optional cloud "ceiling" reference and tie-break judge (RQ comparison only).
+# ---- classifier judge and utility grader ----
 judge:
-  # Used by src/orr/classification/llm_classifier.py for ambiguous cases.
-  # local judge by default; set provider: anthropic/openai to use a cloud ceiling.
-  provider: local
-  local_model: qwen2.5:7b-instruct-q4_K_M
+  refusal_judge: qwen2.5:7b-instruct-q4_K_M    # validated vs humans, kappa = 0.72
+  utility_grader: qwen2.5:7b-instruct-q4_K_M    # primary
+  utility_grader_independent: gemma2:9b-instruct-q4_K_M  # cross-check, r = 0.85
+
+# ---- system-prompt mitigation (intervention) ----
+mitigation:
+  models: [gemma2:9b-instruct-q4_K_M, llama3.1:8b-instruct-q4_K_M]
+  # defensive-role system prompt; see scripts/run_mitigation.py

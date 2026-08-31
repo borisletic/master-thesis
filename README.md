@@ -12,11 +12,13 @@ models × alignment-variants × quantization-levels:
 - **RQ1** — How severe is over-refusal (false-refusal rate) on benign security-SWE
   tasks vs. general benchmarks (XSTest / OR-Bench)?
 - **RQ2** — The *alignment tax*: how much utility on legitimate security tasks is
-  sacrificed by alignment (aligned vs. base/uncensored), and is the tax "justified"
-  (does more benign refusal correlate with better harmful refusal)?
-- **RQ3** — Does quantization (FP16 → INT8 → INT4) shift over-refusal of benign
-  tasks, and in which direction? (Prior work studies quantization × *harmful
-  compliance*; the benign-refusal direction is unexplored.)
+  sacrificed by alignment, and is the tax "justified" (does more benign refusal
+  correlate with better harmful refusal)? Measured across the alignment spectrum
+  from weakly-aligned (mistral) to safety-aggressive (gemma2, llama3.1).
+- **RQ3** — Does quantization shift over-refusal of benign tasks, and in which
+  direction? Measured along a Q8 → Q4 → Q3 → Q2 precision ladder. (Prior work
+  studies quantization × *harmful compliance*; the benign-refusal direction is
+  unexplored.)
 - **RQ4** — Which trigger words/topics drive lexical over-refusal — is
   the failure lexical or contextual?
 
@@ -87,25 +89,31 @@ plus `sweep_hybrid_metrics.json`); the thesis draft is in
 [`docs/thesis/`](docs/thesis/README.md). Findings log: [docs/FINDINGS.md](docs/FINDINGS.md);
 build history: [docs/PROGRESS.md](docs/PROGRESS.md).
 
-### Headline result (security-SWE, validated)
+### Headline result (security-SWE, validated, hard tier _n_=100)
 
 Point estimates come with 95% Wilson intervals; pairwise model comparisons are
 Fisher-exact with Holm correction (`python -m scripts.analyze_stats`). The data
-support a **three-group** split, not a fine ranking of six models — 7 of 15
-pairwise comparisons survive correction.
-
+support a **three-group** split, not a fine ranking of six models — 8 of 15 FRR
+comparisons survive correction.
 
 | Model | over-refusal (FRR hard) | safety (TRR) | effective utility |
 |---|---:|---:|---:|
 | mistral-7B | 0.0% | 41.7% | 0.94 |
-| phi-3.5-mini | 11.1% | 20.8% | 0.71 |
-| qwen2.5-7B Q4 | 5.6% | 79.2% | 0.90 |
-| qwen2.5-7B Q8 | 5.6% | 91.7% | 0.93 |
-| gemma2-9B | 55.6% | 100% | 0.71 |
-| llama3.1-8B | 72.2% | 100% | 0.63 |
+| phi-3.5-mini | 2.0% | 20.8% | 0.71 |
+| qwen2.5-7B Q4 | 1.0% | 79.2% | 0.90 |
+| qwen2.5-7B Q8 | 1.0% | 91.7% | 0.93 |
+| gemma2-9B | 16.0% | 100% | 0.71 |
+| llama3.1-8B | 26.0% | 100% | 0.63 |
 
 **Recommendation:** qwen2.5-7B-Instruct (4-bit) — best joint over-refusal / safety /
 utility on 8 GB on-premise hardware.
+
+**Further results:** quantization is behaviourally neutral Q8→Q3 but safety degrades
+at 2-bit (`scripts/analyze_ladder.py`); a defensive system prompt roughly halves
+gemma2's over-refusal without lowering safety (`scripts/analyze_mitigation.py`).
+Refusal classification is the dominant measurement uncertainty (a lexical heuristic
+recovers only 12% of true refusals). An English preprint is in
+[`docs/arxiv/`](docs/arxiv/main.tex).
 
 ## Figures
 
