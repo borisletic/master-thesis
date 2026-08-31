@@ -441,6 +441,6 @@ self-preference inflation. Quality conclusions robust to grader choice.
 results/grader_agreement.json, scripts/compare_graders.py.
 
 ### Documents
-Thesis rebuilt: 50 pages, 21 tables, 5 figures. Paper: 4 pages. 25 tests pass.
+Thesis rebuilt: 50 pages, 22 tables, 5 figures. Paper: 4 pages. 25 tests pass.
 All n=18 headline numbers replaced with validated n=100 throughout; RQ3 section and
 conclusion revised for the ladder; limitations now report real IAA + grader check.

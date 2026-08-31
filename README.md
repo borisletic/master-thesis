@@ -10,7 +10,7 @@ The study is **inference-only** (no training). It measures, across a matrix of
 models × alignment-variants × quantization-levels:
 
 - **RQ1** — How severe is over-refusal (false-refusal rate) on benign security-SWE
-  tasks vs. general benchmarks (XSTest / OR-Bench)?
+  tasks vs. a general benchmark (XSTest)?
 - **RQ2** — The *alignment tax*: how much utility on legitimate security tasks is
   sacrificed by alignment, and is the tax "justified" (does more benign refusal
   correlate with better harmful refusal)? Measured across the alignment spectrum
@@ -30,8 +30,8 @@ master-thesis/
 │   └── models.yaml
 ├── data/
 │   ├── security_swe/       # OWN dataset (main contribution): benign + harmful pairs
-│   ├── xstest/             # downloaded (Röttger et al. 2024)
-│   └── or_bench/           # downloaded (Cui et al. 2024)
+│   └── xstest/             # downloaded (Röttger et al. 2024)
+│   #   or_bench/           # loader implemented, NOT used in the study (see below)
 ├── src/orr/                # python package ("over-refusal research")
 │   ├── datasets/           # dataset loaders + schema
 │   ├── inference/          # Ollama runner
@@ -110,14 +110,20 @@ utility on 8 GB on-premise hardware.
 
 **Further results:** quantization is behaviourally neutral Q8→Q3 but safety degrades
 at 2-bit (`scripts/analyze_ladder.py`); a defensive system prompt roughly halves
-gemma2's over-refusal without lowering safety (`scripts/analyze_mitigation.py`).
+gemma2's over-refusal (16%→7%, _p_=0.07 — directional, not significant at this _n_)
+without lowering safety (`scripts/analyze_mitigation.py`).
 Refusal classification is the dominant measurement uncertainty (a lexical heuristic
 recovers only 12% of true refusals). An English preprint is in
 [`docs/arxiv/`](docs/arxiv/main.tex).
 
+**Scope note:** OR-Bench (Cui et al. 2024) is discussed as related work and a loader
+is provided (`scripts/download_datasets.py`), but it was **not** run in this study —
+the general-domain baseline is XSTest alone. Extending to OR-Bench is future work.
+
 ## Figures
 
-Regenerate the four figures (95% CIs made visible) with:
+Regenerate figures 1–4 (95% CIs made visible) with the command below; `fig5_ladder.png`
+is emitted by `python -m scripts.analyze_ladder`.
 
 ```bash
 pip install -r requirements-figures.txt

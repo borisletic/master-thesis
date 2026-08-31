@@ -1,1 +1,1 @@
-20260830-233716-rq3-qwen2_5_7b-instruct-q3_K_M-t0.7-r3
+20260831-015622-mitig-llama3_1_8b-instruct-q4_K_M

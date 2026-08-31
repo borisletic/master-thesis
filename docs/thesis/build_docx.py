@@ -264,26 +264,48 @@ def build(template: Path, out: Path, body_xml: str) -> None:
     head = doc[:doc.index('<w:body>') + len('<w:body>')]
     new_doc = head + resolve_refs(body_xml) + sectpr + '</w:body></w:document>'
 
+    # Slike iz predloška koje novi document.xml više ne referiše treba odbaciti.
+    # Bitno kad se kao predložak koristi ranije izgrađen (i u Word-u presnimljen)
+    # .docx: Word preimenuje media u image*.png, pa bi se uz naše orr_fig*.png
+    # svaka slika našla u fajlu dvaput.
+    rels_xml = src.read('word/_rels/document.xml.rels').decode('utf-8')
+    used_rids = set(re.findall(r'r:(?:embed|id|link)="(rId\d+)"', new_doc))
+    orphan_media = {
+        target for rid, target in re.findall(
+            r'Id="(rId\d+)"[^>]*Target="([^"]+)"', rels_xml)
+        if target.startswith('media/') and rid not in used_rids
+    }
+    drop_files = {'word/' + t for t in orphan_media}
+
     out.parent.mkdir(parents=True, exist_ok=True)
     if out.exists():
         out.unlink()
     with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as dst:
         for item in src.infolist():
+            if item.filename in drop_files:
+                continue
             if item.filename == 'word/document.xml':
                 dst.writestr(item, new_doc.encode('utf-8'))
-            elif item.filename == 'word/_rels/document.xml.rels' and _IMAGES:
-                rels = src.read(item.filename).decode('utf-8')
-                extra = ''.join(
-                    f'<Relationship Id="rId{im["rid"]}" '
-                    f'Type="http://schemas.openxmlformats.org/officeDocument/2006/'
-                    f'relationships/image" Target="{im["target"]}"/>'
-                    for im in _IMAGES)
-                dst.writestr(item, rels.replace('</Relationships>', extra + '</Relationships>'))
+            elif item.filename == 'word/_rels/document.xml.rels':
+                rels = rels_xml
+                for t in orphan_media:
+                    rels = re.sub(
+                        r'<Relationship[^>]*Target="' + re.escape(t) + r'"[^>]*/>', '', rels)
+                if _IMAGES:
+                    extra = ''.join(
+                        f'<Relationship Id="rId{im["rid"]}" '
+                        f'Type="http://schemas.openxmlformats.org/officeDocument/2006/'
+                        f'relationships/image" Target="{im["target"]}"/>'
+                        for im in _IMAGES)
+                    rels = rels.replace('</Relationships>', extra + '</Relationships>')
+                dst.writestr(item, rels)
             else:
                 dst.writestr(item, src.read(item.filename))
         for im in _IMAGES:
             dst.writestr('word/' + im['target'], Path(im['path']).read_bytes())
     src.close()
+    if orphan_media:
+        print(f"[clean] dropped {len(orphan_media)} unreferenced template image(s)")
     print(f"[ok] {out}  ({out.stat().st_size // 1024} KB)")
 
 

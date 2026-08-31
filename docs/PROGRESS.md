@@ -85,12 +85,21 @@ _Last updated: 2026-06-28_
    alignment-tax scatter (benign-refusal vs harmful-refusal).
 9. **Thesis write-up** in `docs/thesis/`.
 
-## Open decisions
+## Open decisions — RESOLVED (kept for the record)
 
-- Which exact "uncensored/abliterated" model is the fairest base contrast (RQ2)?
-- OR-Bench split: hard-1k vs the full 80k (cost vs coverage).
-- Utility scoring for RQ2: rubric-based LLM grader vs manual rubric on a subsample.
-- Whether to add a system-prompt arm (XSTest showed system prompts flip behavior).
+- ~~Which exact "uncensored/abliterated" model is the fairest base contrast (RQ2)?~~
+  → **None.** No abliterated model was used; `mistral:latest` serves as the
+  weakly-aligned contrast (see [ETHICS.md](ETHICS.md)).
+- ~~OR-Bench split: hard-1k vs the full 80k?~~ → **Not run.** XSTest is the sole
+  general-domain baseline; OR-Bench stays related work / future scale baseline.
+- ~~Utility scoring for RQ2: LLM grader vs manual rubric?~~ → **LLM grader vs
+  `expected_help` anchors**, cross-checked with an independent gemma2 grader
+  (Pearson _r_ = 0.85).
+- ~~Whether to add a system-prompt arm?~~ → **Added** in Level 3
+  (`scripts/run_mitigation.py`); see below.
+
+> The numbered task lists above are the historical build log (numbering is as it was
+> written); they are superseded by the Level 1–3 sections.
 
 ## Level 3 (2026-08-31): PhD / Big-Tech readiness
 

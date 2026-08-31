@@ -25,6 +25,11 @@ cd docs/thesis
 python build_docx.py --template <FTN_template.docx> --out Master_rad_BorisLetic.docx
 ```
 
+A previously built `.docx` also works as the template (its styles are the FTN ones);
+unreferenced template images are dropped automatically so figures are not duplicated.
+**After every rebuild, open the file in Word and press Ctrl+A then F9** — the table of
+contents is a field and its page numbers are only filled in on that update.
+
 Content lives in `content.py` (ch. 1–2) and `ch2.py`, `ch3_4.py`, `ch5_6.py`,
 `ch7_9.py`. `build_docx.py` copies the FTN template's styles and swaps the body;
 tables/figures are auto-numbered with symbolic `{{T:key}}` / `{{F:key}}`

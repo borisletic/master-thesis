@@ -79,6 +79,13 @@ def main(argv=None) -> int:
         run_dir = _RESULTS / f"{stamp}-mitig-{safe}"
         run_dir.mkdir(parents=True, exist_ok=True)
         (run_dir / "system_prompt.txt").write_text(SYSTEM_PROMPT, encoding="utf-8")
+        (run_dir / "manifest.json").write_text(json.dumps({
+            "created": dt.datetime.now().isoformat(),
+            "models": [model], "datasets": ["security_swe"],
+            "temperature": 0.0, "seed": 42, "num_predict": 512,
+            "classify": "heuristic", "system_prompt": "system_prompt.txt",
+            "n_prompts_per_model": len(prompts),
+        }, indent=2), encoding="utf-8")
         print(f"[model] {model} (with system prompt) -> {run_dir.name}")
         with (run_dir / "responses.jsonl").open("w", encoding="utf-8") as out:
             for i, pr in enumerate(prompts, 1):
