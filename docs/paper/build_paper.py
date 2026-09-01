@@ -36,8 +36,8 @@ MARG = 1134                    # 2 cm sve četiri margine
 COL_GAP = 284                  # 0.5 cm razmak između stubaca
 COL_W = (PW - 2 * MARG - COL_GAP) // 2
 
-# delovi predloška koji se NE prenose (komentari recenzenata i primeri slika)
-_DROP_PREFIXES = ('word/comments', 'word/people.xml', 'word/media/')
+# delovi predloška koji se NE prenose (komentari recenzenata)
+_DROP_PREFIXES = ('word/comments', 'word/people.xml')
 
 
 def esc(t) -> str:
@@ -87,6 +87,28 @@ def styled(style: str, *runs: str, align=None, space_before=None,
 
 def zaglavlje(text) -> str:
     return styled('9-', _run(text))
+
+
+# Zaglavlje Zbornika je u predlošku tabela sa logotipom FTN-a. Preuzima se
+# doslovno, da bi logo i raspored ostali identični predlošku (i da ga rebuild
+# ne bi obrisao). Jedina izmena je razmak u "НовиСад".
+_HEADER_TBL: str | None = None
+
+
+def zaglavlje_tabela(template: Path) -> str:
+    global _HEADER_TBL
+    if _HEADER_TBL is None:
+        x = zipfile.ZipFile(template).read('word/document.xml').decode('utf-8')
+        m = re.search(r'<w:tbl>.*?</w:tbl>', x, re.S)
+        if not m:
+            raise SystemExit('[error] predložak nema tabelu zaglavlja')
+        _HEADER_TBL = m.group().replace('НовиСад', 'Нови Сад')
+    return _HEADER_TBL
+
+
+def prazan(style='0-') -> str:
+    """Prazan pasus kao razmak (predložak ih koristi oko naslova)."""
+    return styled(style)
 
 
 def udk(text) -> str:
@@ -225,8 +247,16 @@ def build(template: Path, out: Path, body_xml: str) -> None:
     head = doc[:doc.index('<w:body>') + len('<w:body>')]
     new_doc = head + body_xml + sect_two() + '</w:body></w:document>'
 
-    dropped = [n for n in src.namelist() if n.startswith(_DROP_PREFIXES)]
-    drop = set(dropped)
+    drop = {n for n in src.namelist() if n.startswith(_DROP_PREFIXES)}
+
+    # Zadrži samo one slike predloška koje novi document.xml stvarno referiše
+    # (logo zaglavlja da, primeri slika iz upútstva ne).
+    rels_xml = src.read('word/_rels/document.xml.rels').decode('utf-8')
+    used_rids = set(re.findall(r'r:(?:embed|id|link)="(rId\d+)"', new_doc))
+    orphan_media = {t for rid, t in re.findall(r'Id="(rId\d+)"[^>]*Target="([^"]+)"', rels_xml)
+                    if t.startswith('media/') and rid not in used_rids}
+    drop |= {'word/' + t for t in orphan_media}
+    dropped = sorted(drop)
 
     out.parent.mkdir(parents=True, exist_ok=True)
     if out.exists():

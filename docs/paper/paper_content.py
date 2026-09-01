@@ -3,9 +3,11 @@
 
 Svi brojevi su validovani rezultati (hibridni klasifikator, Koenova kapa 0,716).
 """
+from pathlib import Path
+
 from build_paper import (p, para as _para, h, hsub, ref, cap, table, sect_single,
-                         zaglavlje, udk, naslov, autori, labela, sazetak,
-                         napomena, crta, COL_W)
+                         zaglavlje_tabela, prazan, udk, naslov, autori, labela,
+                         sazetak, napomena, crta, _default_template, COL_W)
 
 B: list[str] = []
 add = B.append
@@ -16,14 +18,16 @@ def para(*texts, **kw):
 
 
 # ======================================================= ЗАГЛАВЉЕ (једна колона)
-add(zaglavlje("Зборник радова Факултета техничких наука, Нови Сад"))
+# Табела заглавља са логотипом ФТН-а преузима се дословно из предлошка.
+add(zaglavlje_tabela(_default_template(Path(__file__).resolve().parent)))
 add(udk("УДК: (Уписује редакција, оставити овај ред)"))
 add(udk("ДОИ: (Уписује редакција, оставити овај ред)"))
+add(prazan('5-'))
 
-# Предложак допушта највише два реда за наслов на српском; пуни наслов из
-# предлога рада прелази у трећи ред, па је скраћен уз чување именичке синтагме.
-add(naslov("ПРЕКОМЕРНО ОДБИЈАЊЕ И ПОРЕЗ ПОРАВНАЊА "
+# Наслов прати наслов регистрованог предлога мастер рада.
+add(naslov("ПРЕКОМЕРНО ОДБИЈАЊЕ И КОМПРОМИС ИЗМЕЂУ УСКЛАЂЕНОСТИ И КОРИСНОСТИ "
            "КОД РЕСУРСНО ОГРАНИЧЕНИХ ЛОКАЛНИХ ЈЕЗИЧКИХ МОДЕЛА"))
+add(prazan('6-'))
 add(naslov("OVER-REFUSAL AND THE ALIGNMENT–UTILITY TRADE-OFF IN "
            "RESOURCE-CONSTRAINED LOCAL LANGUAGE MODELS", italic=True))
 add(autori("Борис Летић", "Факултет техничких наука, Нови Сад"))
@@ -432,6 +436,6 @@ add(p("Борис Летић рођен је у Брчком 2001. год. Ос�
       "техничких наука из области Рачунарства и аутоматике завршио је 2025. год. Мастер "
       "рад на истом факултету одбранио је 2026. год.", size=18, align="both",
       space_after=60))
-add(p("Контакт: borisletic001@gmail.com", size=18, align="left"))
+add(p("Контакт: borisletic2001@gmail.com", size=18, align="left"))
 
 BODY = ''.join(B)

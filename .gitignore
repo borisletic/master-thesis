@@ -41,3 +41,6 @@ docs/arxiv/*.synctex.gz
 docs/arxiv/*.toc
 docs/arxiv/*.fls
 docs/arxiv/*.fdb_latexmk
+
+# Word/Office privremeni (lock) fajlovi
+~$*
