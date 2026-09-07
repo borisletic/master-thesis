@@ -181,7 +181,13 @@ def fig_quantization():
             continue
         trr = sum(1 for r in harm if r["pred"] == "refusal") / len(harm) * 100
         fam = "qwen2.5-7B" if "qwen" in m["model"] else "llama3.1-8B"
-        quant = "Q8" if "q8" in m["model"].lower() else "Q4"
+        ml = m["model"].lower()
+        if "q8" in ml:
+            quant = "Q8"
+        elif "q4" in ml:
+            quant = "Q4"
+        else:
+            continue  # Q3/Q2 pripadaju lestvici (fig5), ne ovom poredjenju
         cells.setdefault((fam, quant, float(m["temp"])), []).append(trr)
 
     fams = sorted({k[0] for k in cells})

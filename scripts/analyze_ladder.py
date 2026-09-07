@@ -168,7 +168,6 @@ def _figure(per, families, args):
         ax.set_title(fam, fontsize=9)
         ax.set_xlabel("precision (more bits -> fewer)")
         ax.grid(alpha=.25, lw=.5)
-        ax.invert_xaxis()
     axes[0].set_ylabel("True refusal rate (%)")
     fig.suptitle("RQ3 precision ladder: safety across Q8 -> Q2", fontsize=10, y=1.02)
     out = figdir / "fig5_ladder.png"
