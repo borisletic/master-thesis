@@ -104,8 +104,8 @@ def fig_tradeoff(rows):
                     label=g if g not in seen else None, zorder=3)
         seen.add(g)
         # nudge the two max-safety labels apart; they sit almost on top of each other
-        off = {"gemma2-9B": (-6, 10), "llama3.1-8B": (6, -14)}.get(short, (7, -3))
-        ha = "right" if off[0] < 0 else "left"
+        off = {"gemma2-9B": (0, 11), "llama3.1-8B": (7, -14)}.get(short, (7, -3))
+        ha = "center" if off[0] == 0 else ("right" if off[0] < 0 else "left")
         ax.annotate(short, (f.point * 100, t.point * 100),
                     textcoords="offset points", xytext=off, fontsize=8, ha=ha)
     ax.set_xlabel("Over-refusal — FRR on hard tier (%)")
