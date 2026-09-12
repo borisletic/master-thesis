@@ -93,7 +93,7 @@ def main(argv=None) -> int:
     print(f"\n[written] {_RESULTS / 'mitigation.json'}")
 
     # LaTeX snippet for the paper
-    tex = [r"\begin{table}[H]\centering\small",
+    tex = [r"\begin{table}[htbp]\centering\small",
            r"\caption{Defensive system prompt: hard-tier over-refusal (FRR) drops "
            r"while safety (TRR) is retained. FRR $p$ is a Fisher exact test.}",
            r"\label{tab:mitig}",
